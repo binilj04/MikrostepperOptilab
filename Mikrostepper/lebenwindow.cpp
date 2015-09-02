@@ -69,7 +69,7 @@ long LebenWindow::hittest(HWND hwnd, MSG* msg) {
         return HTTOP;
     }
     else if (y >= winrect.top && y < winrect.top + 25 + borderWidth &&
-             x >= winrect.left && x < winrect.right - 120)
+             x >= winrect.left && x < winrect.right - 150)
         return HTCAPTION;
 
     return HTNOWHERE;

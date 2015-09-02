@@ -832,6 +832,18 @@ Rectangle {
             shortcut: "F2"
             keys: "F2"
         }
+        ListElement {
+            name: "View.HideRibbon"
+            command: "(Global) Hide/show menu and status"
+            shortcut: "F11"
+            keys: "F11"
+        }
+        ListElement {
+            name: "View.Fullscreen"
+            command: "(Global) Toggle fullscreen"
+            shortcut: "F12"
+            keys: "F12"
+        }
 
         // Camera
         ListElement {

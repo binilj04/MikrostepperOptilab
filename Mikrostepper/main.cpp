@@ -25,14 +25,14 @@ int main(int argc, char *argv[])
 
     AppSettings settings;
 	settings.updateCNCSettings();
-    MockCamera camera;
+    ToupCamera camera;
 	//if (!camera.isAvailable()) {
 	//	return 0;
 	//}
 
 	vector<unique_ptr<CamProp>> vprop;
 	if (camera.isAvailable())
-		vprop.emplace_back(new NullCamProp(&camera));
+		vprop.emplace_back(new ToupCameraProp(camera.wrapper()));
 	else
 		vprop.emplace_back(new NullCamProp(&camera));
     OptilabViewer ov(&camera);

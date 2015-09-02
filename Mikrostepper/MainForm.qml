@@ -8,6 +8,7 @@ import QtQuick.Window 2.2
 Item {
     id: root
     property alias keysModel: settingspage.keysModel
+    signal fullscreen
 
     width: 1280
     height: 720
@@ -180,6 +181,13 @@ Item {
 
     transitions: [
     ]
+
+    function hideRibbon() {
+        if (root.state === "")
+                root.state = "no_ribbon"
+            else
+                root.state = ""
+    }
 
     function getIndex(name) {
         for (var i = 0; i < keysModel.count; ++i) {
@@ -392,13 +400,13 @@ Item {
 
     Action {
         id: actionHideRibbon
-        shortcut: "F11"
-        onTriggered: {
-            if (root.state === "")
-                root.state = "no_ribbon"
-            else
-                root.state = ""
-        }
+        shortcut: keysModel.get(getIndex("View.HideRibbon")).shortcut
+        onTriggered: hideRibbon()
+    }
+    Action {
+        id: actionFullscreen
+        shortcut: keysModel.get(getIndex("View.Fullscreen")).shortcut
+        onTriggered: root.fullscreen()
     }
 
     Component.onDestruction: {

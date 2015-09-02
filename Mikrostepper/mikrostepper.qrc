@@ -71,5 +71,11 @@
         <file>Images/ArrowLSmall.png</file>
         <file>BookmarkMenu.qml</file>
         <file>KeySlider.qml</file>
+        <file>Images/HideRibbon.png</file>
+        <file>Images/HideRibbon-hover.png</file>
+        <file>Images/ShowRibbon.png</file>
+        <file>Images/ShowRibbon-hover.png</file>
+        <file>Images/Optilab.ico</file>
+        <file>Optilab.ico</file>
     </qresource>
 </RCC>

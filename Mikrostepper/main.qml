@@ -60,12 +60,22 @@ LebenWindow {
                 TextRegular {
                     id: title
                     Layout.fillWidth: true
-                    text: "MICONOS Microstepper"
+                    text: "MICONOS Optilab"
                     font.pointSize: 10
                     font.letterSpacing: 1
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     color: "#2c3e50"
+                }
+                ToolButton {
+                    id: hideRibbonBtn
+                    iconSource: {
+                        if (mainForm.state == "")
+                            hovered ? "Images/HideRibbon-hover.png" : "Images/HideRibbon.png"
+                        else
+                            hovered ? "Images/ShowRibbon-hover.png" : "Images/ShowRibbon.png"
+                    }
+                    onClicked: mainForm.hideRibbon()
                 }
                 ToolButton {
                     id: minimizeBtn
@@ -101,10 +111,15 @@ LebenWindow {
                 top: titleBar.bottom; bottom: parent.bottom
                 topMargin: 5
             }
+            onFullscreen: {
+                if (win.visibility === Window.FullScreen) {
+                    win.showNormal()
+                }
+                else
+                    win.showFullScreen()
+            }
         }
     }
-
-
 
     Component.onCompleted: {
 //        win.showMaximized()

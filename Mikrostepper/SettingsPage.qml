@@ -12,21 +12,6 @@ Rectangle {
     height: 600
 
     function initSettings() {
-        for (var d = 0; d < doublesettings.count; ++d) {
-            var val = appsettings.readDouble(doublesettings.get(d).name, doublesettings.get(d).defval)
-            doublesettings.set(d, { "value": val })
-        }
-
-        for (var b = 0; b < booleansettings.count; ++b) {
-            var bval = appsettings.readBool(booleansettings.get(b).name, booleansettings.get(b).defval)
-            booleansettings.set(b, { "value": bval })
-        }
-
-        for (var j = 0; j < integersettings.count; ++j) {
-            var ival = appsettings.readInt(integersettings.get(j).name, integersettings.get(j).defval)
-            integersettings.set(j, { "value": ival })
-        }
-
         for (var i = 0; i < _model.count; ++i) {
             var key = appsettings.readShortcut(_model.get(i).name, _model.get(i).keys)
             _model.set(i, { "shortcut": key })
@@ -34,97 +19,23 @@ Rectangle {
     }
 
     function updateSettings() {
-        for (var d = 0; d < doublesettings.count; ++d) {
-            var val = appsettings.readDouble(doublesettings.get(d).name, doublesettings.get(d).defval)
-            if (val !== doublesettings.get(d).value)
-                appsettings.saveSettings(doublesettings.get(d).name, doublesettings.get(d).value)
-        }
-
-        for (var b = 0; b < booleansettings.count; ++b) {
-            var bval = appsettings.readBool(booleansettings.get(b).name, booleansettings.get(b).defval)
-            if (bval !== booleansettings.get(b).value)
-                appsettings.saveSettings(booleansettings.get(b).name, booleansettings.get(b).value)
-        }
-
-        for (var j = 0; j < integersettings.count; ++j) {
-            var ival = appsettings.readInt(integersettings.get(j).name, integersettings.get(j).defval)
-            if (ival !== integersettings.get(j).value)
-                appsettings.saveSettings(integersettings.get(j).name, integersettings.get(j).value)
-        }
-
         for (var i = 0; i < _model.count; ++i) {
             var key = appsettings.readShortcut(_model.get(i).name, _model.get(i).keys)
             if (key !== _model.get(i).shortcut)
                 appsettings.saveShortcut(_model.get(i).name, _model.get(i).shortcut)
         }
-
-        if (stepperunitx.value !== appsettings.readCNCStepsPerUnitX()) {
-            appsettings.saveSettings("StepPerUnitX", stepperunitx.value)
-            requireRestart = true
-        }
-        if (stepperunity.value !== appsettings.readCNCStepsPerUnitY()) {
-            appsettings.saveSettings("StepPerUnitY", stepperunity.value)
-            requireRestart = true
-        }
-        if (stepperunitz.value !== appsettings.readCNCStepsPerUnitZ()) {
-            appsettings.saveSettings("StepPerUnitZ", stepperunitz.value)
-            requireRestart = true
-        }
     }
 
     function restoreSettings() {
-        for (var d = 0; d < doublesettings.count; ++d) {
-            var val = appsettings.readDouble(doublesettings.get(d).name, doublesettings.get(d).defval)
-            if (val !== doublesettings.get(d).defval)
-                appsettings.eraseSettings(doublesettings.get(d).name)
-        }
-
-        for (var b = 0; b < booleansettings.count; ++b) {
-            var bval = appsettings.readBool(booleansettings.get(b).name, booleansettings.get(b).defval)
-            if (val !== booleansettings.get(b).defval)
-                appsettings.eraseSettings(booleansettings.get(b).name)
-        }
-
-        for (var j = 0; j < integersettings.count; ++j) {
-            var ival = appsettings.readInt(integersettings.get(j).name, integersettings.get(j).defval)
-            if (val !== integersettings.get(j).defval)
-                appsettings.eraseSettings(integersettings.get(j).name)
-        }
-
         for (var i = 0; i < _model.count; ++i) {
             var key = appsettings.readShortcut(_model.get(i).name, _model.get(i).keys)
             if (key !== _model.get(i).keys)
                 appsettings.resetShortcut(_model.get(i).name)
         }
-
-        if (5096.0 !== appsettings.readCNCStepsPerUnitX()) {
-            stepperunitx.value = 5096.0
-            appsettings.eraseSettings("StepPerUnitX")
-            requireRestart = true
-        }
-        if (5096.0 !== appsettings.readCNCStepsPerUnitY()) {
-            stepperunity.value = 5096.0
-            appsettings.eraseSettings("StepPerUnitY")
-            requireRestart = true
-        }
-        if (10667.0 !== appsettings.readCNCStepsPerUnitZ()) {
-            stepperunitz.value = 10667.0
-            appsettings.eraseSettings("StepPerUnitZ")
-            requireRestart = true
-        }
     }
-
-    function setZeroX() { stepper.setZeroX() }
-    function setZeroY() { stepper.setZeroY() }
-    function setZeroZ() { stepper.setZeroZ() }
 
     BusyDialog {
         id: initbusy
-    }
-
-    Connections {
-        target: navigator
-        onInitializeDone: initbusy.close()
     }
 
     RowLayout {
@@ -164,20 +75,6 @@ Rectangle {
                 }
 
                 ButtonText {
-                    id: buttonText2
-                    text: "Stepper"
-                    textDefault: "#000000"
-                    checkable: true
-                    fontSize: 8
-                    textAlignment: 1
-                    Layout.alignment: Qt.AlignCenter
-                    exclusiveGroup: group1
-                    onCheckedChanged: {
-                        if (checked) root.state = "grid settings"
-                    }
-                }
-
-                ButtonText {
                     id: buttonText3
                     text: "Keyboard"
                     textDefault: "#000000"
@@ -188,20 +85,6 @@ Rectangle {
                     exclusiveGroup: group1
                     onCheckedChanged: {
                         if (checked) root.state = "keyboard settings"
-                    }
-                }
-
-                ButtonText {
-                    id: buttonText4
-                    text: "Miscellaneous"
-                    textDefault: "#000000"
-                    checkable: true
-                    fontSize: 8
-                    textAlignment: 1
-                    Layout.alignment: Qt.AlignCenter
-                    exclusiveGroup: group1
-                    onCheckedChanged: {
-                        if (checked) root.state = "misc settings"
                     }
                 }
 
@@ -866,287 +749,6 @@ Rectangle {
             }
 
             Item {
-                id: stepperContent
-                visible: false
-                anchors.fill: parent
-
-                GridLayout {
-                    id: gridLayout1
-                    rowSpacing: 10
-                    columnSpacing: 20
-                    anchors.left: parent.left
-                    anchors.leftMargin: 20
-                    anchors.top: parent.top
-                    anchors.topMargin: 20
-                    columns: 7
-
-                    Item { width: 2 }
-                    Item { width: 2 }
-
-                    TextBlack {
-                        text: "Soft Limit"
-                        font.pointSize: 9
-                        Layout.columnSpan: 2
-                    }
-                    Item { width: 2 }
-                    TextBlack {
-                        text: "Limit Switches"
-                        font.pointSize: 9
-                        Layout.columnSpan: 2
-                    }
-
-                    Item { width: 2 }
-                    TextRegular {
-                        text: "Steps/Unit"
-                    }
-                    TextRegular {
-                        text: "Limit Min"
-                    }
-                    TextRegular {
-                        text: "Limit Max"
-                    }
-                    TextRegular {
-                        text: "Enable"
-                    }
-                    TextRegular {
-                        text: "Stop"
-                        Layout.columnSpan: 2
-                    }
-
-                    TextBlack {
-                        text: "X"
-                        font.pointSize: 9
-                    }
-                    SpinBox {
-                        id: stepperunitx
-                        value: appsettings.readCNCStepsPerUnitX()
-                        stepSize: 100
-                        minimumValue: 10
-                        maximumValue: 99999
-                    }
-                    SpinBox {
-                        id: limitminx
-                        value: doublesettings.get(0).value
-                        suffix: " mm"
-                        maximumValue: 1000
-                        decimals: 3
-                        onValueChanged: doublesettings.setProperty(0, "value", value)
-                    }
-                    SpinBox {
-                        id: limitmaxx
-                        value: doublesettings.get(1).value
-                        suffix: " mm"
-                        maximumValue: 1000
-                        minimumValue: limitminx.value + 1
-                        decimals: 3
-                        onValueChanged: doublesettings.setProperty(1, "value", value)
-                    }
-                    CheckBox {
-                        id: enablelimitx
-                        checked: booleansettings.get(6).value
-                        onCheckedChanged: booleansettings.setProperty(6, "value", checked)
-                    }
-                    CheckBox {
-                        id: minstopx
-                        text: "Min"
-                        checked: booleansettings.get(0).value
-                        onCheckedChanged: booleansettings.setProperty(0, "value", checked)
-                    }
-                    CheckBox {
-                        id: maxstopx
-                        text: "Max"
-                        checked: booleansettings.get(1).value
-                        onCheckedChanged: booleansettings.setProperty(1, "value", checked)
-                    }
-
-                    TextBlack {
-                        text: "Y"
-                        font.pointSize: 9
-                    }
-                    SpinBox {
-                        id: stepperunity
-                        value: appsettings.readCNCStepsPerUnitY()
-                        stepSize: 100
-                        minimumValue: 10
-                        maximumValue: 99999
-                    }
-                    SpinBox {
-                        id: limitminy
-                        value: doublesettings.get(2).value
-                        suffix: " mm"
-                        maximumValue: 1000
-                        decimals: 3
-                        onValueChanged: doublesettings.setProperty(2, "value", value)
-                    }
-                    SpinBox {
-                        id: limitmaxy
-                        value: doublesettings.get(3).value
-                        suffix: " mm"
-                        minimumValue: limitminy.value + 1
-                        maximumValue: 1000
-                        decimals: 3
-                        onValueChanged: doublesettings.setProperty(3, "value", value)
-                    }
-                    CheckBox {
-                        id: enablelimity
-                        checked: booleansettings.get(7).value
-                        onCheckedChanged: booleansettings.setProperty(7, "value", checked)
-                    }
-                    CheckBox {
-                        id: minstopy
-                        text: "Min"
-                        checked: booleansettings.get(2).value
-                        onCheckedChanged: booleansettings.setProperty(2, "value", checked)
-                    }
-                    CheckBox {
-                        id: maxstopy
-                        text: "Max"
-                        checked: booleansettings.get(3).value
-                        onCheckedChanged: booleansettings.setProperty(3, "value", checked)
-                    }
-
-                    TextBlack {
-                        text: "Z"
-                        font.pointSize: 9
-                    }
-                    SpinBox {
-                        id: stepperunitz
-                        value: appsettings.readCNCStepsPerUnitZ()
-                        stepSize: 100
-                        minimumValue: 10
-                        maximumValue: 99999
-                    }
-                    SpinBox {
-                        id: limitminz
-                        value: doublesettings.get(4).value
-                        suffix: " mm"
-                        maximumValue: 1000
-                        decimals: 3
-                        onValueChanged: doublesettings.setProperty(4, "value", value)
-                    }
-                    SpinBox {
-                        id: limitmaxz
-                        value: doublesettings.get(5).value
-                        suffix: " mm"
-                        minimumValue: limitminz.value + 1
-                        maximumValue: 1000
-                        decimals: 3
-                        onValueChanged: doublesettings.setProperty(5, "value", value)
-                    }
-                    CheckBox {
-                        id: enablelimitz
-                        checked: booleansettings.get(8).value
-                        onCheckedChanged: booleansettings.setProperty(8, "value", checked)
-                    }
-                    CheckBox {
-                        id: minstopz
-                        text: "Min"
-                        checked: booleansettings.get(4).value
-                        onCheckedChanged: booleansettings.setProperty(4, "value", checked)
-                    }
-                    CheckBox {
-                        id: maxstopz
-                        text: "Max"
-                        checked: booleansettings.get(5).value
-                        onCheckedChanged: booleansettings.setProperty(5, "value", checked)
-                    }
-
-                }
-
-                GridLayout {
-                    rowSpacing: 10
-                    columnSpacing: 20
-                    anchors.left: parent.left
-                    anchors.leftMargin: 20
-                    anchors.top: gridLayout1.bottom
-                    anchors.topMargin: 20
-                    columns: 3
-
-                    TextBlack {
-                        text: "Speed"
-                        font.pointSize: 9
-                        Layout.columnSpan: 3
-                    }
-                    TextRegular {
-                        text: "Normal"
-                    }
-                    SpinBox {
-                        id: speednormal
-                        value: doublesettings.get(7).value
-                        maximumValue: 1000
-                        minimumValue: 10
-                        decimals: 3
-                        onValueChanged: doublesettings.setProperty(7, "value", value)
-                    }
-                    Item { width: 2 }
-
-                    TextRegular {
-                        text: "Slow"
-                    }
-                    SpinBox {
-                        id: speedlow
-                        value: doublesettings.get(6).value
-                        maximumValue: 1000
-                        minimumValue: 1
-                        decimals: 3
-                        onValueChanged: doublesettings.setProperty(6, "value", value)
-                    }
-                    Item { width: 2 }
-
-                    Item { width: 2; Layout.columnSpan: 3 }
-
-                    TextBlack {
-                        text: "Set Zero"
-                        font.pointSize: 9
-                        Layout.columnSpan: 3
-                    }
-                    Button {
-                        id: xtozero
-                        text: "X"
-                        tooltip: "Set current X to 0.0"
-                        onClicked: setZeroX()
-                    }
-                    Button {
-                        id: ytozero
-                        text: "Y"
-                        tooltip: "Set current Y to 0.0"
-                        onClicked: setZeroY()
-                    }
-                    Button {
-                        id: ztozero
-                        text: "Z"
-                        tooltip: "Set current Z to 0.0"
-                        onClicked: setZeroZ()
-                    }
-
-                    TextBlack {
-                        text: "Initialize"
-                        font.pointSize: 9
-                        Layout.columnSpan: 3
-                    }
-                    Button {
-                        id: xinit
-                        text: "X"
-                        tooltip: "Initialize X axis"
-                        onClicked: {
-                            initbusy.open()
-                            navigator.initializeXAx()
-                        }
-                    }
-                    Button {
-                        id: yinit
-                        text: "Y"
-                        tooltip: "Initialize Y axis"
-                        onClicked: {
-                            initbusy.open()
-                            navigator.initializeYAx()
-                        }
-                    }
-                    Item { width: 2 }
-                }
-            }
-
-            Item {
                 id: keyboardContent
                 anchors.fill: parent
                 visible: false
@@ -1201,179 +803,10 @@ Rectangle {
                     }
                 }
             }
-
-            Item {
-                id: miscContent
-                anchors.fill: parent
-                visible: false
-
-                ExclusiveGroup { id: group3 }
-
-                ColumnLayout {
-                    id: columnLayout2
-                    anchors.left: parent.left
-                    anchors.leftMargin: 20
-                    anchors.top: parent.top
-                    anchors.topMargin: 20
-                    width: 150
-                    height: 10
-                    spacing: 10
-
-                    TextBlack {
-                        id: textBlack6
-                        text: "Grid View"
-                        font.pointSize: 10
-                    }
-
-                    TextRegular {
-                        id: textRegular11
-                        text: "Column count"
-                    }
-
-                    SpinBox {
-                        id: gridcolumn
-                        value: integersettings.get(0).value
-                        maximumValue: 16
-                        minimumValue: 1
-                        Layout.preferredWidth: 100
-                        Layout.alignment: Qt.AlignLeft
-                        onValueChanged: {
-                            requireRestart = true
-                            integersettings.setProperty(0, "value", value)
-                        }
-                    }
-
-                    TextRegular {
-                        id: textRegular12
-                        text: "Row count"
-                    }
-
-                    SpinBox {
-                        id: gridrow
-                        value: integersettings.get(1).value
-                        maximumValue: 16
-                        minimumValue: 1
-                        Layout.preferredWidth: 100
-                        Layout.alignment: Qt.AlignLeft
-                        onValueChanged: {
-                            requireRestart = true
-                            integersettings.setProperty(1, "value", value);
-                        }
-                    }
-
-                    TextRegular {
-                        text: "Frame Overlap"
-                    }
-
-                    SpinBox {
-                        id: gridoverlap
-                        value: doublesettings.get(9).value * 100
-                        maximumValue: 100
-                        minimumValue: 0
-                        suffix: " %"
-                        Layout.preferredWidth: 100
-                        Layout.alignment: Qt.AlignLeft
-                        onValueChanged: doublesettings.setProperty(9, "value", value / 100.0)
-                    }
-
-                    CheckBox {
-                        id: gridAutofocus
-                        text: "Autofocus"
-                        checked: booleansettings.get(9).value
-                        onCheckedChanged: booleansettings.setProperty(9, "value", checked)
-                    }
-
-                    CheckBox {
-                        id: gridGigapan
-                        text: "Gigapan integration"
-                        checked: booleansettings.get(11).value
-                        onCheckedChanged: booleansettings.setProperty(11, "value", checked)
-                    }
-
-                    Item { height: 10 }
-
-                    TextBlack {
-                        id: textBlack7
-                        text: "Map View"
-                        font.pointSize: 10
-                    }
-
-                    TextRegular {
-                        id: textRegular13
-                        text: "Scale"
-                    }
-
-                    SpinBox {
-                        id: mapscale
-                        value: 1/doublesettings.get(8).value
-                        minimumValue: 1
-                        maximumValue: 500
-                        prefix: "1 : "
-                        Layout.preferredWidth: 100
-                        Layout.alignment: Qt.AlignLeft
-                        onValueChanged: doublesettings.set(8, { "value": 1/value })
-                    }
-
-                    TextRegular {
-                        text: "Frame Overlap"
-                    }
-
-                    SpinBox {
-                        id: mapoverlap
-                        value: doublesettings.get(10).value * 100
-                        maximumValue: 100
-                        minimumValue: 0
-                        suffix: " %"
-                        Layout.preferredWidth: 100
-                        Layout.alignment: Qt.AlignLeft
-                        onValueChanged: doublesettings.setProperty(10, "value", value / 100.0)
-                    }
-
-                    CheckBox {
-                        id: mapAutofocus
-                        text: "Autofocus"
-                        checked: booleansettings.get(10).value
-                        onCheckedChanged: booleansettings.setProperty(10, "value", checked)
-                    }
-
-                    CheckBox {
-                        id: mapGigapan
-                        text: "Gigapan integration"
-                        checked: booleansettings.get(12).value
-                        onCheckedChanged: booleansettings.setProperty(12, "value", checked)
-                    }
-                }
-            }
-        }
+       }
     }
 
     states: [
-        State {
-            name: "grid settings"
-
-            PropertyChanges {
-                target: stepperContent
-                visible: true
-            }
-
-            PropertyChanges {
-                target: cameraContent
-                visible: false
-            }
-        },
-        State {
-            name: "misc settings"
-
-            PropertyChanges {
-                target: miscContent
-                visible: true
-            }
-
-            PropertyChanges {
-                target: cameraContent
-                visible: false
-            }
-        },
         State {
             name: "keyboard settings"
 
@@ -1393,30 +826,6 @@ Rectangle {
         id: _model
 
         // Set View
-        ListElement {
-            name: "View.Single"
-            command: "(Global) Single View"
-            shortcut: "Ctrl+1"
-            keys: "Ctrl+1"
-        }
-        ListElement {
-            name: "View.Grid"
-            command: "(Global) Grid View"
-            shortcut: "Ctrl+2"
-            keys: "Ctrl+2"
-        }
-        ListElement {
-            name: "View.Map"
-            command: "(Global) Map View"
-            shortcut: "Ctrl+3"
-            keys: "Ctrl+3"
-        }
-        ListElement {
-            name: "View.Calibration"
-            command: "(Global) Calibration View"
-            shortcut: "Ctrl+4"
-            keys: "Ctrl+4"
-        }
         ListElement {
             name: "View.Settings"
             command: "(Global) Open Settings Page"
@@ -1539,409 +948,91 @@ Rectangle {
             shortcut: 'Shift+:'
             keys: 'Shift+:'
         }
-        ListElement {
-            name: "RedUp"
-            command: "(Global) Increase red channel gain"
-            shortcut: ""
-            keys: ""
-        }
-        ListElement {
-            name: "RedDown"
-            command: "(Global) Decrease red channel gain"
-            shortcut: ""
-            keys: ""
-        }
-        ListElement {
-            name: "GreenUp"
-            command: "(Global) Increase green channel gain"
-            shortcut: ""
-            keys: ""
-        }
-        ListElement {
-            name: "GreenDown"
-            command: "(Global) Decrease green channel gain"
-            shortcut: ""
-            keys: ""
-        }
-        ListElement {
-            name: "BlueUp"
-            command: "(Global) Increase blue channel gain"
-            shortcut: ""
-            keys: ""
-        }
-        ListElement {
-            name: "BlueDown"
-            command: "(Global) Decrease blue channel gain"
-            shortcut: ""
-            keys: ""
-        }
-
-        // Jog
-        ListElement {
-            name: "JogUp"
-            command: "(Global) Move up"
-            shortcut: "Up"
-            keys: "Up"
-        }
-        ListElement {
-            name: "JogRight"
-            command: "(Global) Move right"
-            shortcut: "Right"
-            keys: "Right"
-        }
-        ListElement {
-            name: "JogDown"
-            command: "(Global) Move down"
-            shortcut: "Down"
-            keys: "Down"
-        }
-        ListElement {
-            name: "JogLeft"
-            command: "(Global) Move left"
-            shortcut: "Left"
-            keys: "Left"
-        }
-        ListElement {
-            name: "JogZUp"
-            command: "(Global) Move up along z axis"
-            shortcut: "PgUp"
-            keys: "PgUp"
-        }
-        ListElement {
-            name: "JogZDown"
-            command: "(Global) Move down along z axis"
-            shortcut: "PgDown"
-            keys: "PgDown"
-        }
-
-        // Frame Jog
-        ListElement {
-            name: "FrameUp"
-            command: "(Global) Move up by one frame"
-            shortcut: "W"
-            keys: "W"
-        }
-        ListElement {
-            name: "FrameRight"
-            command: "(Global) Move right by one frame"
-            shortcut: "D"
-            keys: "D"
-        }
-        ListElement {
-            name: "FrameDown"
-            command: "(Global) Move down by one frame"
-            shortcut: "S"
-            keys: "S"
-        }
-        ListElement {
-            name: "FrameLeft"
-            command: "(Global) Move left by one frame"
-            shortcut: "A"
-            keys: "A"
-        }
-
-        // Micron Jog
-        ListElement {
-            name: "MicronUp"
-            command: "(Global) Move up by one micron"
-            shortcut: "Ctrl+W"
-            keys: "Ctrl+W"
-        }
-        ListElement {
-            name: "MicronRight"
-            command: "(Global) Move right by one micron"
-            shortcut: "Ctrl+D"
-            keys: "Ctrl+D"
-        }
-        ListElement {
-            name: "MicronDown"
-            command: "(Global) Move down by one micron"
-            shortcut: "Ctrl+S"
-            keys: "Ctrl+S"
-        }
-        ListElement {
-            name: "MicronLeft"
-            command: "(Global) Move left by one micron"
-            shortcut: "Ctrl+A"
-            keys: "Ctrl+A"
-        }
-        ListElement {
-            name: "MicronZUp"
-            command: "(Global) Move up along z axis by one micron"
-            shortcut: "Alt+PgUp"
-            keys: "Alt+PgUp"
-        }
-        ListElement {
-            name: "MicronZDown"
-            command: "(Global) Move down along z axis by one micron"
-            shortcut: "Alt+PgDown"
-            keys: "Alt+PgDown"
-        }
-
-        // Slow Jog
-        ListElement {
-            name: "JogSlowUp"
-            command: "(Global) Move up slowly"
-            shortcut: "Ctrl+Up"
-            keys: "Ctrl+Up"
-        }
-        ListElement {
-            name: "JogSlowRight"
-            command: "(Global) Move right slowly"
-            shortcut: "Ctrl+Right"
-            keys: "Ctrl+Right"
-        }
-        ListElement {
-            name: "JogSlowDown"
-            command: "(Global) Move down slowly"
-            shortcut: "Ctrl+Down"
-            keys: "Ctrl+Down"
-        }
-        ListElement {
-            name: "JogSlowLeft"
-            command: "(Global) Move left slowly"
-            shortcut: "Ctrl+Left"
-            keys: "Ctrl+Left"
-        }
-        ListElement {
-            name: "JogSlowZUp"
-            command: "(Global) Move up along z axis slowly"
-            shortcut: "Ctrl+PgUp"
-            keys: "Ctrl+PgUp"
-        }
-        ListElement {
-            name: "JogSlowZDown"
-            command: "(Global) Move down along z axis slowly"
-            shortcut: "Ctrl+PgDown"
-            keys: "Ctrl+PgDown"
-        }
 
         // Single View
         ListElement {
             name: "Single.SingleCapture"
-            command: "(SingleView) Single Capture"
+            command: "(Camera) Single Capture"
             shortcut: "F5"
             keys: "F5"
         }
         ListElement {
             name: "Single.CountCapture"
-            command: "(SingleView) Start serial capture mode count"
+            command: "(Camera) Start serial capture mode count"
             shortcut: ""
             keys: ""
         }
         ListElement {
             name: "Single.CountIntervalUp"
-            command: "(SingleView) Increase interval time for capture mode count"
+            command: "(Camera) Increase interval time for capture mode count"
             shortcut: ""
             keys: ""
         }
         ListElement {
             name: "Single.CountIntervalDown"
-            command: "(SingleView) Decrease interval time for capture mode count"
+            command: "(Camera) Decrease interval time for capture mode count"
             shortcut: ""
             keys: ""
         }
         ListElement {
             name: "Single.CountUp"
-            command: "(SingleView) Increase frame count for capture mode count"
+            command: "(Camera) Increase frame count for capture mode count"
             shortcut: ""
             keys: ""
         }
         ListElement {
             name: "Single.CountDown"
-            command: "(SingleView) Decrease frame count for capture mode count"
+            command: "(Camera) Decrease frame count for capture mode count"
             shortcut: ""
             keys: ""
         }
         ListElement {
             name: "Single.DurationCapture"
-            command: "(SingleView) Start serial capture mode duration"
+            command: "(Camera) Start serial capture mode duration"
             shortcut: ""
             keys: ""
         }
         ListElement {
             name: "Single.DurationIntervalUp"
-            command: "(SingleView) Increase interval time for capture mode duration"
+            command: "(Camera) Increase interval time for capture mode duration"
             shortcut: ""
             keys: ""
         }
         ListElement {
             name: "Single.DurationIntervalDown"
-            command: "(SingleView) Decrease interval time for capture mode duration"
+            command: "(Camera) Decrease interval time for capture mode duration"
             shortcut: ""
             keys: ""
         }
         ListElement {
             name: "Single.DurationUp"
-            command: "(SingleView) Increase duration time for capture mode count"
+            command: "(Camera) Increase duration time for capture mode count"
             shortcut: ""
             keys: ""
         }
         ListElement {
             name: "Single.DurationDown"
-            command: "(SingleView) Decrease duration time for capture mode count"
+            command: "(Camera) Decrease duration time for capture mode count"
             shortcut: ""
             keys: ""
         }
         ListElement {
             name: "Single.StartRecording"
-            command: "(SingleView) Start Recording"
+            command: "(Camera) Start Recording"
             shortcut: "F6"
             keys: "F6"
         }
         ListElement {
             name: "Single.PauseRecording"
-            command: "(SingleView) Pause Recording"
+            command: "(Camera) Pause Recording"
             shortcut: ""
             keys: ""
         }
         ListElement {
             name: "Single.StopRecording"
-            command: "(SingleView) Stop Recording"
+            command: "(Camera) Stop Recording"
             shortcut: "F7"
             keys: "F7"
-        }
-
-        // Grid View
-        ListElement {
-            name: "Grid.SelectUp"
-            command: "(GridView) Select up cell"
-            shortcut: "Up"
-            keys: "Up"
-        }
-        ListElement {
-            name: "Grid.SelectRight"
-            command: "(GridView) Select right cell"
-            shortcut: "Right"
-            keys: "Right"
-        }
-        ListElement {
-            name: "Grid.SelectDown"
-            command: "(GridView) Select down cell"
-            shortcut: "Down"
-            keys: "Down"
-        }
-        ListElement {
-            name: "Grid.SelectLeft"
-            command: "(GridView) Select left cell"
-            shortcut: "Left"
-            keys: "Left"
-        }
-        ListElement {
-            name: "Grid.ShiftUp"
-            command: "(GridView) Shift Up"
-            shortcut: "W"
-            keys: "W"
-        }
-        ListElement {
-            name: "Grid.ShiftRight"
-            command: "(GridView) Shift Right"
-            shortcut: "D"
-            keys: "D"
-        }
-        ListElement {
-            name: "Grid.ShiftDown"
-            command: "(GridView) Shift Down"
-            shortcut: "S"
-            keys: "S"
-        }
-        ListElement {
-            name: "Grid.ShiftLeft"
-            command: "(GridView) Shift Left"
-            shortcut: "A"
-            keys: "A"
-        }
-        ListElement {
-            name: "Grid.MoveToSelected"
-            command: "(GridView) Move to selected"
-            shortcut: "Return"
-            keys: "Return"
-        }
-        ListElement {
-            name: "Grid.FillSelection"
-            command: "(GridView) Fill selected cells"
-            shortcut: "F9"
-            keys: "F9"
-        }
-        ListElement {
-            name: "Grid.AutoFill"
-            command: "(GridView) Automatically fill cells"
-            shortcut: ""
-            keys: ""
-        }
-        ListElement {
-            name: "Grid.SaveSelected"
-            command: "(GridView) Save selected cells"
-            shortcut: "Ctrl+S"
-            keys: "Ctrl+S"
-        }
-        ListElement {
-            name: "Grid.SaveAll"
-            command: "(GridView) Save all cells with image"
-            shortcut: ""
-            keys: ""
-        }
-        ListElement {
-            name: "Grid.ClearSelected"
-            command: "(GridView) Clear selected cells"
-            shortcut: "Del"
-            keys: "Del"
-        }
-        ListElement {
-            name: "Grid.InvertClear"
-            command: "(GridView) Clear all except selected cells"
-            shortcut: ""
-            keys: ""
-        }
-        ListElement {
-            name: "Grid.ClearBuffers"
-            command: "(GridView) Clear all cells"
-            shortcut: ""
-            keys: ""
-        }
-        ListElement {
-            name: "Grid.Enlarge"
-            command: "(GridView) Enlarge cells"
-            shortcut: "PgUp"
-            keys: "PgUp"
-        }
-        ListElement {
-            name: "Grid.Shrink"
-            command: "(GridView) Shrink cells"
-            shortcut: "PgDown"
-            keys: "PgDown"
-        }
-
-        // Map View
-        ListElement {
-            name: "Map.StartCapture"
-            command: "(MapView) Start capture"
-            shortcut: "F10"
-            keys: "F10"
-        }
-        ListElement {
-            name: "Map.MarkPoint1"
-            command: "(MapView) Mark current position as point 1"
-            shortcut: "1"
-            keys: "1"
-        }
-        ListElement {
-            name: "Map.MarkPoint2"
-            command: "(MapView) Mark current position as point 2"
-            shortcut: "2"
-            keys: "2"
-        }
-        ListElement {
-            name: "Map.MarkPoint3"
-            command: "(MapView) Mark current position as point 3"
-            shortcut: "3"
-            keys: "3"
-        }
-        ListElement {
-            name: "Map.MarkPoint4"
-            command: "(MapView) Mark current position as point 4"
-            shortcut: "4"
-            keys: "4"
         }
     }
 
@@ -1972,148 +1063,6 @@ Rectangle {
         }
         _model.setProperty(keyboardView.currentRow, "shortcut", key)
         event.key.accepted = true
-    }
-
-    ListModel {
-        id: doublesettings
-        ListElement {
-            name: "LimitXMin"
-            value: 1.0
-            defval: 1.0
-        }
-        ListElement {
-            name: "LimitXMax"
-            value: 50.0
-            defval: 50.0
-        }
-        ListElement {
-            name: "LimitYMin"
-            value: 1.0
-            defval: 1.0
-        }
-        ListElement {
-            name: "LimitYMax"
-            value: 25.0
-            defval: 25.0
-        }
-        ListElement {
-            name: "LimitZMin"
-            value: 0.0
-            defval: 0.0
-        }
-        ListElement {
-            name: "LimitZMax"
-            value: 100.0
-            defval: 100.0
-        }
-        ListElement {
-            name: "SpeedLo"
-            value: 10.0
-            defval: 10.0
-        }
-        ListElement {
-            name: "SpeedHi"
-            value: 100.0
-            defval: 100.0
-        }
-        ListElement {
-            name: "MapScale"
-            value: 0.01
-            defval: 0.01
-        }
-        ListElement {
-            name: "GridOverlap"
-            value: 0.25
-            defval: 0.25
-        }
-        ListElement {
-            name: "MapOverlap"
-            value: 0.25
-            defval: 0.25
-        }
-    }
-
-    ListModel {
-        id: booleansettings
-        ListElement {
-            name: "StopOnMinX"
-            value: true
-            defval: true
-        }
-        ListElement {
-            name: "StopOnMaxX"
-            value: true
-            defval: true
-        }
-        ListElement {
-            name: "StopOnMinY"
-            value: true
-            defval: true
-        }
-        ListElement {
-            name: "StopOnMaxY"
-            value: true
-            defval: true
-        }
-        ListElement {
-            name: "StopOnMinZ"
-            value: true
-            defval: true
-        }
-        ListElement {
-            name: "StopOnMaxZ"
-            value: true
-            defval: true
-        }
-        ListElement {
-            name: "EnableLimitX"
-            value: true
-            defval: true
-        }
-        ListElement {
-            name: "EnableLimitY"
-            value: true
-            defval: true
-        }
-        ListElement {
-            name: "EnableLimitZ"
-            value: false
-            defval: false
-        }
-        ListElement {
-            name: "GridAutofocus"
-            value: true
-            defval: true
-        }
-        ListElement {
-            name: "MapAutofocus"
-            value: true
-            defval: true
-        }
-        ListElement {
-            name: "GridGigapan"
-            value: true
-            defval: true
-        }
-        ListElement {
-            name: "MapGigapan"
-            value: true
-            defval: true
-        }
-    }
-
-    ListModel {
-        id: integersettings
-        ListElement {
-            name: "GridCol"
-            value: 13
-            defval: 13
-        }
-        ListElement {
-            name: "GridRow"
-            value: 13
-            defval: 13
-        }
     }
 
     Component.onCompleted: {

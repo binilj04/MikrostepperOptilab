@@ -40,6 +40,7 @@ public slots:
 	void scaleImage(const QString& image, int w, int h, 
 		Qt::AspectRatioMode as = Qt::IgnoreAspectRatio, 
 		Qt::TransformationMode md = Qt::SmoothTransformation);
+	QSize imageSize(const QString& image);
 
     void nextCommand();
 

@@ -88,9 +88,16 @@ void OptilabViewer::copyToFolder(const QUrl &image, const QUrl &folder) {
 void OptilabViewer::scaleImage(const QString& image, int w, int h, Qt::AspectRatioMode ar, Qt::TransformationMode md) 
 {
 	QImage im{ image };
+	if (im.isNull()) return;
 	auto img = im.scaled(w, h, ar, md);
 	QFile::remove(image);
 	img.save(image);
+}
+
+QSize OptilabViewer::imageSize(const QString& image)
+{
+	QImage im{ image };
+	return im.size();
 }
 
 void OptilabViewer::addCommand(Command cmd) {

@@ -37,6 +37,9 @@ public slots:
 	QUrl saveToTemp(const QString& imgName);
     void copyFromTemp(const QString& imgName, const QUrl& fullPath);
     void copyToFolder(const QUrl& image, const QUrl& folder);
+	void scaleImage(const QString& image, int w, int h, 
+		Qt::AspectRatioMode as = Qt::IgnoreAspectRatio, 
+		Qt::TransformationMode md = Qt::SmoothTransformation);
 
     void nextCommand();
 

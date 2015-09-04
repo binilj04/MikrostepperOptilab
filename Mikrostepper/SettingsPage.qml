@@ -34,6 +34,31 @@ Rectangle {
         }
     }
 
+    function updateCamera() {
+        sliderHue.value = camprop.hue
+        sliderContrast.value = camprop.contrast
+        sliderSaturation.value = camprop.saturation
+        sliderGamma.value = camprop.gamma
+        checkboxAutoExposure.checked = camprop.autoexposure
+        sliderGain.value = camprop.aeGain / 100
+        sliderTime.value = camprop.exposureTime / 1000
+        sliderTarget.value = camprop.aeTarget
+        sliderTemperature.value = camprop.whiteBalanceTemperature
+        sliderTint.value = camprop.whiteBalanceTint
+        if (camprop.isColor)
+            checkBoxColor.checked = true
+        else
+            checkBoxBW.checked = true
+        if (camprop.isHFlip)
+            checkBoxHFlip.checked = true
+        if (camprop.isVFlip)
+            checkBoxVFlip.checked = true
+        if (camprop.isBin)
+            checkBoxBin.checked = true
+        else
+            checkBoxSkip.checked = true
+    }
+
     BusyDialog {
         id: initbusy
     }
@@ -370,11 +395,11 @@ Rectangle {
 
                         KeySlider {
                             id: sliderHue
-                            value: camprop.hue
                             minimumValue: -180
                             maximumValue: 180
                             stepSize: 1
                             Layout.alignment: Qt.AlignCenter
+                            onValueChanged: camprop.hue = value
                         }
 
                         TextRegular {
@@ -384,10 +409,10 @@ Rectangle {
 
                         KeySlider {
                             id: sliderSaturation
-                            value: camprop.saturation
                             maximumValue: 255
                             stepSize: 1
                             Layout.alignment: Qt.AlignCenter
+                            onValueChanged: camprop.saturation = value
                         }
 
                         TextRegular {
@@ -396,11 +421,11 @@ Rectangle {
 
                         KeySlider {
                             id: sliderBrightness
-                            value: camprop.brightness
                             minimumValue: -64
                             maximumValue: 64
                             stepSize: 1
                             Layout.alignment: Qt.AlignCenter
+                            onValueChanged: camprop.brightness = value
                         }
 
                         TextRegular {
@@ -410,10 +435,10 @@ Rectangle {
 
                         KeySlider {
                             id: sliderContrast
-                            value: camprop.contrast
                             maximumValue: 100
                             stepSize: 1
                             Layout.alignment: Qt.AlignCenter
+                            onValueChanged: camprop.contrast = value
                         }
 
                         TextRegular {
@@ -425,9 +450,9 @@ Rectangle {
                             id: sliderGamma
                             maximumValue: 250
                             minimumValue: 10
-                            value: camprop.gamma
                             stepSize: 1.0
                             Layout.alignment: Qt.AlignCenter
+                            onValueChanged: camprop.gamma = value
                         }
 
                         Item { height: 15 }
@@ -454,10 +479,10 @@ Rectangle {
                             id: sliderTarget
                             maximumValue: 235
                             minimumValue: 16
-                            value: camprop.aeTarget
                             stepSize: 1
                             enabled: checkboxAutoExposure.checked
                             Layout.alignment: Qt.AlignCenter
+                            onValueChanged: camprop.aeTarget = value
                         }
 
                         TextRegular {
@@ -469,10 +494,10 @@ Rectangle {
                             id: sliderTime
                             maximumValue: 2000
                             minimumValue: 0.1
-//                            value: camprop.exposureTime / 1000
                             stepSize: 0.1
                             enabled: !checkboxAutoExposure.checked
                             Layout.alignment: Qt.AlignCenter
+                            onValueChanged: camprop.exposureTime = value * 1000
                         }
 
                         TextRegular {
@@ -484,10 +509,10 @@ Rectangle {
                             id: sliderGain
                             maximumValue: 5
                             minimumValue: 1
-//                            value: camprop.aeGain / 100
                             stepSize: 0.01
                             enabled: !checkboxAutoExposure.checked
                             Layout.alignment: Qt.AlignCenter
+                            onValueChanged: camprop.aeGain = value * 100
                         }
 
                         Item { height: 15 }
@@ -506,8 +531,8 @@ Rectangle {
                             id: sliderTemperature
                             minimumValue: 2000
                             maximumValue: 15000
-                            value: camprop.whiteBalanceTemperature
                             Layout.alignment: Qt.AlignCenter
+                            onValueChanged: camprop.whiteBalanceTemperature = value
                         }
 
                         TextRegular {
@@ -518,9 +543,9 @@ Rectangle {
                             id: sliderTint
                             minimumValue: 200
                             maximumValue: 2500
-                            value: camprop.whiteBalanceTint
                             stepSize: 1
                             Layout.alignment: Qt.AlignCenter
+                            onValueChanged: camprop.whiteBalanceTint = value
                         }
 
                         TextBlack {
@@ -537,10 +562,10 @@ Rectangle {
                             property string label: "Slowest"
                             minimumValue: 0
                             maximumValue: 3
-                            value: camprop.frameRate
                             stepSize: 1
                             Layout.alignment: Qt.AlignCenter
                             onValueChanged: {
+                                camprop.frameRate = value
                                 switch (value) {
                                 case 0:
                                     label = "Slowest"
@@ -562,23 +587,19 @@ Rectangle {
                             text: "Color Mode"
                         }
 
+                        ExclusiveGroup { id: isColorGroup }
+
                         RadioButton {
                             id: checkBoxColor
                             text: "Color"
-                            checked: camprop.isColor
-                            onCheckedChanged: {
-                                if (checked)
-                                    camprop.isColor = true
-                            }
+                            exclusiveGroup: isColorGroup
+                            onCheckedChanged: camprop.isColor = checked
                         }
 
                         RadioButton {
+                            id: checkBoxBW
                             text: "Black/White"
-                            checked: !checkBoxColor.checked
-                            onCheckedChanged: {
-                                if (checked)
-                                    camprop.isColor = false
-                            }
+                            exclusiveGroup: isColorGroup
                         }
 
                         TextRegular {
@@ -586,42 +607,35 @@ Rectangle {
                         }
 
                         CheckBox {
-                            id: cbHFlip
+                            id: checkBoxHFlip
                             text: "Horizontal"
-                            onCheckedChanged: {
-                                camprop.isHFlip = checked
-                            }
+                            onCheckedChanged: camprop.isHFlip = checked
+
                         }
 
                         CheckBox {
-                            id: cbVFlip
+                            id: checkBoxVFlip
                             text: "Vertical"
-                            onCheckedChanged: {
-                                camprop.isVFlip = checked
-                            }
+                            onCheckedChanged: camprop.isVFlip = checked
                         }
 
                         TextRegular {
                             text: "Sampling method"
                         }
 
+                        ExclusiveGroup { id: isBinGroup }
+
                         RadioButton {
                             id: checkBoxBin
                             text: "Bin (better image, slower)"
-                            checked: camprop.isBin
-                            onCheckedChanged: {
-                                if (checked)
-                                    camprop.isBin = true
-                            }
+                            exclusiveGroup: isBinGroup
+                            onCheckedChanged: camprop.isBin = checked
                         }
 
                         RadioButton {
+                            id: checkBoxSkip
                             text: "Skip (fast)"
-                            checked: !checkBoxBin.checked
-                            onCheckedChanged: {
-                                if (checked)
-                                    camprop.isBin = false
-                            }
+                            exclusiveGroup: isBinGroup
                         }
                     }
                 }
@@ -656,10 +670,7 @@ Rectangle {
                         exclusiveGroup: group2
                         onCheckedChanged: {
                             if (checked) camprop.loadParametersA()
-                            sliderTime.value = camprop.exposureTime / 1000.0
-                            sliderGain.value = camprop.aeGain / 100.0
-                            cbHFlip.checked = camprop.isHFlip
-                            cbVFlip.checked = camprop.isVFlip
+                            updateCamera()
                         }
                     }
 
@@ -670,10 +681,7 @@ Rectangle {
                         exclusiveGroup: group2
                         onCheckedChanged: {
                             if (checked) camprop.loadParametersB()
-                            sliderTime.value = camprop.exposureTime / 1000.0
-                            sliderGain.value = camprop.aeGain / 100.0
-                            cbHFlip.checked = camprop.isHFlip
-                            cbVFlip.checked = camprop.isVFlip
+                            updateCamera()
                         }
                     }
 
@@ -684,10 +692,7 @@ Rectangle {
                         exclusiveGroup: group2
                         onCheckedChanged: {
                             if (checked) camprop.loadParametersC()
-                            sliderTime.value = camprop.exposureTime / 1000.0
-                            sliderGain.value = camprop.aeGain / 100.0
-                            cbHFlip.checked = camprop.isHFlip
-                            cbVFlip.checked = camprop.isVFlip
+                            updateCamera()
                         }
                     }
 
@@ -698,10 +703,7 @@ Rectangle {
                         exclusiveGroup: group2
                         onCheckedChanged: {
                             if (checked) camprop.loadParametersD()
-                            sliderTime.value = camprop.exposureTime / 1000.0
-                            sliderGain.value = camprop.aeGain / 100.0
-                            cbHFlip.checked = camprop.isHFlip
-                            cbVFlip.checked = camprop.isVFlip
+                            updateCamera()
                         }
                     }
 
@@ -721,7 +723,10 @@ Rectangle {
                         id: button2
                         text: qsTr("Default")
                         Layout.alignment: Qt.AlignCenter
-                        onClicked: camprop.loadDefaultParameters()
+                        onClicked: {
+                            camprop.loadDefaultParameters()
+                            updateCamera()
+                        }
                     }
                 }
 
@@ -1082,39 +1087,19 @@ Rectangle {
         if (lastParams === 0) {
             radioButton1.checked = true
             camprop.loadParametersA()
-            sliderTime.value = camprop.exposureTime / 1000.0
-            sliderGain.value = camprop.aeGain / 100.0
-            cbHFlip.checked = camprop.isHFlip
-            cbVFlip.checked = camprop.isVFlip
         }
         else if (lastParams === 1) radioButton2.checked = true
         else if (lastParams === 2) radioButton3.checked = true
         else radioButton4.checked = true
+        updateCamera()
         aeMonitor.running = true
     }
 
-    Binding { target: camprop; property: "hue"; value: sliderHue.value }
-    Binding { target: camprop; property: "saturation"; value: sliderSaturation.value }
-    Binding { target: camprop; property: "brightness"; value: sliderBrightness.value }
-    Binding { target: camprop; property: "contrast"; value: sliderContrast.value }
-    Binding { target: camprop; property: "gamma"; value: sliderGamma.value }
-    Binding { target: camprop; property: "aeTarget"; value: sliderTarget.value }
-    Binding { target: camprop; property: "exposureTime"; value: sliderTime.value * 1000 }
-    Binding { target: camprop; property: "aeGain"; value: sliderGain.value * 100 }
-    Binding { target: camprop; property: "whiteBalanceTemperature"; value: sliderTemperature.value }
-    Binding { target: camprop; property: "whiteBalanceTint"; value: sliderTint.value }
-    Binding { target: camprop; property: "frameRate"; value: sliderFrameRate.value }
-
-    Timer {
-        id: aeMonitor
-        interval: 500
-        repeat: true
-        onTriggered: {
-            if (checkboxAutoExposure.checked) {
-                sliderTime.value = camprop.exposureTime / 1000.0
-                sliderGain.value = camprop.aeGain / 100.0
-            }
-        }
+    Connections {
+        target: camprop
+        onExposureTimeChanged: sliderTime.value = camprop.exposureTime / 1000.0
+        onAeGainChanged: sliderGain.value = camprop.aeGain / 100.0
     }
+
 }
 

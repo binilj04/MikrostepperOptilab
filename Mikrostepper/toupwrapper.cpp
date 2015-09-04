@@ -504,7 +504,7 @@ bool ToupWrapper::isBinMode() const
 
 void ToupWrapper::toggleMode()
 {
-	bool bin = (isBinMode());
+	bool bin = isBinMode();
 	Toupcam_put_Mode(htoupcam, !bin);
 }
 

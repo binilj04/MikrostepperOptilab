@@ -109,6 +109,7 @@ Rectangle {
         contentItem: PreviewImage {
             id: singlePreview
             onAccept: {
+                optilab.scaleImage("swrdaol.jpg", 4100, 3075)
                 optilab.copyFromTemp("swrdaol.jpg", preview1.savePath)
                 preview1.source = ""
                 preview1.hide()

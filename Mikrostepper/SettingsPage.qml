@@ -1092,7 +1092,6 @@ Rectangle {
         else if (lastParams === 2) radioButton3.checked = true
         else radioButton4.checked = true
         updateCamera()
-        aeMonitor.running = true
     }
 
     Connections {

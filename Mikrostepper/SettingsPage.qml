@@ -497,7 +497,7 @@ Rectangle {
                             stepSize: 0.1
                             enabled: !checkboxAutoExposure.checked
                             Layout.alignment: Qt.AlignCenter
-                            onValueChanged: camprop.exposureTime = value * 1000
+                            onValueChanged: if (!checkboxAutoExposure.checked) camprop.exposureTime = value * 1000
                         }
 
                         TextRegular {
@@ -512,7 +512,7 @@ Rectangle {
                             stepSize: 0.01
                             enabled: !checkboxAutoExposure.checked
                             Layout.alignment: Qt.AlignCenter
-                            onValueChanged: camprop.aeGain = value * 100
+                            onValueChanged: if (!checkboxAutoExposure.checked) camprop.aeGain = value * 100
                         }
 
                         Item { height: 15 }
@@ -1094,10 +1094,15 @@ Rectangle {
         updateCamera()
     }
 
-    Connections {
-        target: camprop
-        onExposureTimeChanged: sliderTime.value = camprop.exposureTime / 1000.0
-        onAeGainChanged: sliderGain.value = camprop.aeGain / 100.0
+    Timer {
+        id: aeUpdater
+        repeat: true
+        interval: 100
+        running: checkboxAutoExposure.checked
+        onTriggered: {
+            sliderTime.value = camprop.exposureTime / 1000.0
+            sliderGain.value = camprop.aeGain / 100.0
+        }
     }
 
 }

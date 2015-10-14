@@ -173,6 +173,19 @@ QStringList OptilabViewer::startSerialCaptureAsync(int interval, int fcount) {
 	return namelist;
 }
 
+void OptilabViewer::captureAsync(const QUrl& file)
+{
+	std::async(std::launch::async, [this](const QUrl& f){ capture(f); }, file);
+}
+
+void OptilabViewer::capture(const QUrl& file)
+{
+	if (QFile::exists(file.toLocalFile()))
+		QFile::remove(file.toLocalFile());
+	m_camera->saveBuffer(file.toLocalFile());
+	emit imageSaved(file);
+}
+
 void OptilabViewer::initRecorder(const QUrl &video) {
     m_camera->recorder.initRecorder(video.toLocalFile());
 	m_camera->recorder.start();

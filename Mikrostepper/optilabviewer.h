@@ -53,6 +53,9 @@ public slots:
     QStringList startSerialCapture(int interval, int fcount);
 	QStringList startSerialCaptureAsync(int interval, int fcount);
 
+	void captureAsync(const QUrl& filename);
+	void capture(const QUrl&);
+
     void initRecorder(const QUrl& video);
     void pauseRecording();
     void resumeRecording();

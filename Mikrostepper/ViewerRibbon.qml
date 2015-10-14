@@ -15,6 +15,18 @@ Rectangle {
 
     property bool _lastAE
     property real _lastExpTime
+    property int _scCount: 0
+
+    function zeroPad(num, numZeros) {
+        var n = Math.abs(num);
+        var zeros = Math.max(0, numZeros - Math.floor(n).toString().length );
+        var zeroString = Math.pow(10,zeros).toString().substr(1);
+        if( num < 0 ) {
+            zeroString = '-' + zeroString;
+        }
+
+        return zeroString+n;
+    }
 
     function singleCapture() {
         _lastAE = camprop.autoexposure
@@ -44,12 +56,10 @@ Rectangle {
     }
 
     function countCapture() {
-        var count = spinSCount.val
-        var interval = ie1.totalInterval()
-        if (count == 0 || interval === 0) return
-        previewsc.totalCount = count
-        previewsc.open()
-        optilab.startSerialCaptureAsync(interval * 1000, count)
+        _scCount = spinSCount.val
+        // Somehow the timer is twice faster than expected?
+        countTimer.interval = ie1.totalInterval() * 2000
+        countTimer.start()
     }
 
     function countUp() { spinSCount.val += 1 }
@@ -60,11 +70,43 @@ Rectangle {
     function durationCapture() {
         var interval = ie2.totalInterval()
         var duration = ie3.totalInterval()
-        var count = Math.round(duration / interval)
-        if (count == 0 || interval === 0) return
-        previewsc.totalCount = count
-        previewsc.open()
-        optilab.startSerialCaptureAsync(interval * 1000, count)
+        _scCount = Math.round(duration / interval)
+        // Somehow the timer is twice faster than expected?
+        durationTimer.interval = interval * 2000
+        durationTimer.start()
+    }
+
+    Timer {
+        id: countTimer
+        repeat: true
+        onTriggered: {
+            if (_scCount == 1)
+                stop()
+            optilab.captureAsync(countDialog.folder + "/IMG_" + Qt.formatDateTime(new Date(), "dd-MM-yyyy_hh-mm-ss-zzz") + ".png")
+            console.log(interval)
+            --_scCount
+        }
+    }
+    Timer {
+        id: durationTimer
+        repeat: true
+        onTriggered: {
+            if (_scCount == 1)
+                stop()
+            optilab.captureAsync(durationDialog.folder + "/IMG_" + Qt.formatDateTime(new Date(), "dd-MM-yyyy_hh-mm-ss-zzz") + ".png")
+            --_scCount
+        }
+    }
+
+    FileDialog {
+        id: countDialog
+        selectFolder: true
+        onAccepted: if (folder != "") countCapture()
+    }
+    FileDialog {
+        id: durationDialog
+        selectFolder: true
+        onAccepted: if (folder != "") durationCapture()
     }
 
     function durationUp() { ie3.addInterval() }
@@ -119,10 +161,6 @@ Rectangle {
                 preview1.hide()
             }
         }
-    }
-
-    PreviewSC {
-        id: previewsc
     }
 
     TimeEdit {
@@ -183,7 +221,8 @@ Rectangle {
         anchors.left: rectangle1.right
         anchors.leftMargin: 10
         anchors.verticalCenter: btnCapture.verticalCenter
-        onClicked: countCapture()
+        enabled: (ie1.totalInterval() > 0) && (!countTimer.running)
+        onClicked: countDialog.open()
     }
 
     TextRegular {
@@ -242,7 +281,8 @@ Rectangle {
         anchors.left: rectangle2.right
         anchors.leftMargin: 10
         anchors.verticalCenter: btnSCap.verticalCenter
-        onClicked: durationCapture()
+        enabled: (ie2.totalInterval() + ie3.totalInterval() > 0) && (!durationTimer.running)
+        onClicked: durationDialog.open()
     }
 
     ButtonSimple {

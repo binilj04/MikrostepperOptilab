@@ -13,6 +13,7 @@ class OptilabViewer : public QObject
     Q_OBJECT
     Q_ENUMS(RecordingStatus)
     Q_PROPERTY(RecordingStatus recordingStatus READ recordingStatus NOTIFY recordingStatusChanged)
+	Q_PROPERTY(bool scRunning READ scRunning NOTIFY scRunningChanged)
 public:
     explicit OptilabViewer(Camera *parent);
     ~OptilabViewer();
@@ -23,13 +24,18 @@ public:
 
     void addCommand(Command cmd);
     RecordingStatus recordingStatus() const { return en_recording; }
+
+	bool scRunning() const;
 signals:
-    void imageSaved(const QUrl& imgPath);
+    void imageSaved(const QString& imgPath);
     void remainingCommand(int remaining);
     void recordingTime(const QString& time);
     void recordingStatusChanged();
 
 	void captureReady(const QUrl& filename);
+
+	void preciseTimerTriggered();
+	void scRunningChanged(bool);
 
 public slots:
     QSize calculateAspectRatio(int screenWidth, int screenHeight) const;
@@ -61,11 +67,17 @@ public slots:
     void resumeRecording();
     void stopRecording();
 
+	// An utility function! Qt really should add this to Qt namespace!!
+	QUrl fromLocalFile(const QString& localfile);
+	void startPreciseTimer(int duration);
+	void stopPreciseTimer();
+
 private:
     Camera* m_camera;
 
     CommandPool commandPool;
     RecordingStatus en_recording;
+	QTimer m_timer;
 };
 
 #endif // OPTILABVIEWER_H

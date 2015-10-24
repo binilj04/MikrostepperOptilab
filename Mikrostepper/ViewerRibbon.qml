@@ -16,6 +16,8 @@ Rectangle {
     property bool _lastAE
     property real _lastExpTime
     property int _scCount: 0
+    property int _interval: 0
+    property bool isSCOn: _scCount > 0
 
     function zeroPad(num, numZeros) {
         var n = Math.abs(num);
@@ -53,13 +55,12 @@ Rectangle {
             preview1.source = filename
             preview1.open()
         }
-    }
-
-    function countCapture() {
-        _scCount = spinSCount.val
-        // Somehow the timer is twice faster than expected?
-        countTimer.interval = ie1.totalInterval() * 2000
-        countTimer.start()
+        onPreciseTimerTriggered: {
+            if (_scCount == 1)
+                optilab.stopPreciseTimer()
+            optilab.captureAsync(scDialog.folder + "/IMG_" + Qt.formatDateTime(new Date(), "dd-MM-yyyy_hh-mm-ss-zzz") + ".png")
+            --_scCount
+        }
     }
 
     function countUp() { spinSCount.val += 1 }
@@ -67,46 +68,14 @@ Rectangle {
     function countIntervalUp() { ie1.addInterval() }
     function countIntervalDown() { ie1.minInterval() }
 
-    function durationCapture() {
-        var interval = ie2.totalInterval()
-        var duration = ie3.totalInterval()
-        _scCount = Math.round(duration / interval)
-        // Somehow the timer is twice faster than expected?
-        durationTimer.interval = interval * 2000
-        durationTimer.start()
-    }
-
-    Timer {
-        id: countTimer
-        repeat: true
-        onTriggered: {
-            if (_scCount == 1)
-                stop()
-            optilab.captureAsync(countDialog.folder + "/IMG_" + Qt.formatDateTime(new Date(), "dd-MM-yyyy_hh-mm-ss-zzz") + ".png")
-            console.log(interval)
-            --_scCount
-        }
-    }
-    Timer {
-        id: durationTimer
-        repeat: true
-        onTriggered: {
-            if (_scCount == 1)
-                stop()
-            optilab.captureAsync(durationDialog.folder + "/IMG_" + Qt.formatDateTime(new Date(), "dd-MM-yyyy_hh-mm-ss-zzz") + ".png")
-            --_scCount
-        }
+    function serialCapture() {
+        optilab.startPreciseTimer(_interval)
     }
 
     FileDialog {
-        id: countDialog
+        id: scDialog
         selectFolder: true
-        onAccepted: if (folder != "") countCapture()
-    }
-    FileDialog {
-        id: durationDialog
-        selectFolder: true
-        onAccepted: if (folder != "") durationCapture()
+        onAccepted: if (folder != "") serialCapture()
     }
 
     function durationUp() { ie3.addInterval() }
@@ -221,8 +190,12 @@ Rectangle {
         anchors.left: rectangle1.right
         anchors.leftMargin: 10
         anchors.verticalCenter: btnCapture.verticalCenter
-        enabled: (ie1.totalInterval() > 0) && (!countTimer.running)
-        onClicked: countDialog.open()
+        enabled: (ie1.totalInterval() > 0) && (!optilab.scRunning)
+        onClicked: {
+            _scCount = spinSCount.val
+            _interval = ie1.totalInterval() * 1000
+            scDialog.open()
+        }
     }
 
     TextRegular {
@@ -281,8 +254,14 @@ Rectangle {
         anchors.left: rectangle2.right
         anchors.leftMargin: 10
         anchors.verticalCenter: btnSCap.verticalCenter
-        enabled: (ie2.totalInterval() + ie3.totalInterval() > 0) && (!durationTimer.running)
-        onClicked: durationDialog.open()
+        enabled: (ie2.totalInterval() + ie3.totalInterval() > 0) && (!optilab.scRunning)
+        onClicked: {
+            var interval = ie2.totalInterval()
+            var duration = ie3.totalInterval()
+            _scCount = Math.round(duration / interval)
+            _interval = interval * 1000
+            scDialog.open()
+        }
     }
 
     ButtonSimple {

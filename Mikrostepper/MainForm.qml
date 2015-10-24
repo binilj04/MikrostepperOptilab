@@ -55,6 +55,56 @@ Item {
         onAccepted: Qt.quit()
     }
 
+    SerialCaptureView {
+        id: scview
+        property int _count: 0
+        property int _total: 0
+        anchors {
+            right: content.right; rightMargin: 10
+            left: content.left; leftMargin: 0.8 * content.width
+            top: content.top; topMargin: 0.25 * content.height
+            bottom: content.bottom; bottomMargin: 0.25 * content.height
+        }
+        z: 100
+
+        ListModel {
+            id: scmodel
+        }
+        model: scmodel
+
+        Connections {
+            target: optilab
+            onImageSaved: {
+                if (scmodel.count > 2)
+                    scmodel.remove(0)
+                scmodel.append({"path": imgPath})
+                scview._count += 1
+            }
+        }
+
+        Connections {
+            target: viewerRibbon
+            onIsSCOnChanged: {
+                if (viewerRibbon.isSCOn) {
+                    scmodel.clear()
+                    scview._count = 0
+                    scview._total = viewerRibbon._scCount
+                }
+            }
+        }
+
+        on_CountChanged: {
+            if (_count == _total)
+                clearer.start()
+        }
+
+        Timer {
+            id: clearer
+            interval: 3000
+            onTriggered: scmodel.clear()
+        }
+    }
+
     Item {
         id: ribbon
         height: 150

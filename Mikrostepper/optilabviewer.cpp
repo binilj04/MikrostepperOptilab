@@ -23,6 +23,9 @@ OptilabViewer::OptilabViewer(Camera *parent)
 
 	connect(m_camera, &Camera::captureReady, 
 		[this](const QString& fn) { emit captureReady(QUrl::fromLocalFile(fn)); });
+
+	m_timer.setTimerType(Qt::PreciseTimer);
+	connect(&m_timer, &QTimer::timeout, this, &OptilabViewer::preciseTimerTriggered);
 }
 
 OptilabViewer::~OptilabViewer()
@@ -127,7 +130,7 @@ using Ms = std::chrono::milliseconds;
 void OptilabViewer::addCaptureWaitCommand(const QString &imgName, int msecond){
     addCommand([=]() {
 		auto start = Clock::now();
-        emit imageSaved(saveToTemp(imgName));
+        emit imageSaved(saveToTemp(imgName).toLocalFile());
 		auto end = Clock::now();
 		auto elapsed = std::chrono::duration_cast<Ms>(end - start);
 		auto dur = (msecond - elapsed.count() <= 1) ? 1 : msecond - elapsed.count();
@@ -161,7 +164,7 @@ QStringList OptilabViewer::startSerialCaptureAsync(int interval, int fcount) {
 			auto msecond = Ms(itr);
 		for (int i = 0; i < fc; ++i) {
 			auto start = Clock::now();
-			emit imageSaved(saveToTemp(namelist.at(i)));
+			emit imageSaved(saveToTemp(namelist.at(i)).toLocalFile());
 			auto end = Clock::now();
 			auto elapsed = std::chrono::duration_cast<Ms>(end - start);
 			auto dur = msecond - elapsed;
@@ -183,7 +186,7 @@ void OptilabViewer::capture(const QUrl& file)
 	if (QFile::exists(file.toLocalFile()))
 		QFile::remove(file.toLocalFile());
 	m_camera->saveBuffer(file.toLocalFile());
-	emit imageSaved(file);
+	emit imageSaved(file.toLocalFile());
 }
 
 void OptilabViewer::initRecorder(const QUrl &video) {
@@ -209,4 +212,27 @@ void OptilabViewer::stopRecording() {
 	m_camera->recorder.stop();
     en_recording = WaitForFile;
     emit recordingStatusChanged();
+}
+
+QUrl OptilabViewer::fromLocalFile(const QString& localfile)
+{
+	return QUrl::fromLocalFile(localfile);
+}
+
+bool OptilabViewer::scRunning() const
+{
+	return m_timer.isActive();
+}
+
+void OptilabViewer::startPreciseTimer(int duration)
+{
+	m_timer.start(duration);
+	emit preciseTimerTriggered();
+	emit scRunningChanged(true);
+}
+
+void OptilabViewer::stopPreciseTimer()
+{
+	m_timer.stop();
+	emit scRunningChanged(false);
 }

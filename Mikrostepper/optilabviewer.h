@@ -72,6 +72,11 @@ public slots:
 	void startPreciseTimer(int duration);
 	void stopPreciseTimer();
 
+	QString currentPath();
+	QString homePath();
+	QString tempPath();
+	QString rootPath();
+
 private:
     Camera* m_camera;
 

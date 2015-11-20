@@ -17,6 +17,8 @@
 
 using namespace std;
 
+#define MOCK_CAM
+
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
@@ -25,16 +27,17 @@ int main(int argc, char *argv[])
 
     AppSettings settings;
 	settings.updateCNCSettings();
-    ToupCamera camera;
-	//if (!camera.isAvailable()) {
-	//	return 0;
-	//}
-
 	vector<unique_ptr<CamProp>> vprop;
+#ifdef MOCK_CAM
+	MockCamera camera;
+	vprop.emplace_back(new NullCamProp(&camera));
+#else
+    ToupCamera camera;
 	if (camera.isAvailable())
 		vprop.emplace_back(new ToupCameraProp(camera.wrapper()));
 	else
 		vprop.emplace_back(new NullCamProp(&camera));
+#endif
     OptilabViewer ov(&camera);
     QQmlApplicationEngine engine(&camera);
     auto ctx = engine.rootContext();

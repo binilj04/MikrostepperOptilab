@@ -58,7 +58,8 @@ Rectangle {
         onPreciseTimerTriggered: {
             if (_scCount == 1)
                 optilab.stopPreciseTimer()
-            optilab.captureAsync(scDialog.folder + "/IMG_" + Qt.formatDateTime(new Date(), "dd-MM-yyyy_hh-mm-ss-zzz") + ".png")
+            var fout = optilab.fromLocalFile(optilab.currentPath() + "/IMG_" + Qt.formatDateTime(new Date(), "dd-MM-yyyy_hh-mm-ss-zzz") + ".png")
+            optilab.captureAsync(fout)
             --_scCount
         }
     }
@@ -69,13 +70,9 @@ Rectangle {
     function countIntervalDown() { ie1.minInterval() }
 
     function serialCapture() {
+        previewSC.open()
+        previewSC.totalCount = _scCount
         optilab.startPreciseTimer(_interval)
-    }
-
-    FileDialog {
-        id: scDialog
-        selectFolder: true
-        onAccepted: if (folder != "") serialCapture()
     }
 
     function durationUp() { ie3.addInterval() }
@@ -104,8 +101,8 @@ Rectangle {
     Dialog {
         id: preview1
         title: "Preview"
-        width: 640
-        height: 480
+        width: 800
+        height: 600
 
         property alias source : singlePreview.source
         property alias savePath : singlePreview.savePath
@@ -130,6 +127,10 @@ Rectangle {
                 preview1.hide()
             }
         }
+    }
+
+    PreviewSC {
+        id: previewSC
     }
 
     TimeEdit {
@@ -194,7 +195,7 @@ Rectangle {
         onClicked: {
             _scCount = spinSCount.val
             _interval = ie1.totalInterval() * 1000
-            scDialog.open()
+            serialCapture()
         }
     }
 
@@ -260,7 +261,7 @@ Rectangle {
             var duration = ie3.totalInterval()
             _scCount = Math.round(duration / interval)
             _interval = interval * 1000
-            scDialog.open()
+            serialCapture()
         }
     }
 

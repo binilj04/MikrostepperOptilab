@@ -77,7 +77,5 @@
         <file>Images/ShowRibbon-hover.png</file>
         <file>Images/Optilab.ico</file>
         <file>Optilab.ico</file>
-        <file>SerialCaptureModel.qml</file>
-        <file>SerialCaptureView.qml</file>
     </qresource>
 </RCC>

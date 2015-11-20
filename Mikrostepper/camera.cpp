@@ -50,8 +50,17 @@ void MockCamera::capture(int resolution, const QString &fileName) {
     m_buffer.save(fileName);
 }
 
-void MockCamera::saveBuffer(const QString& fileName) {
-	m_buffer.save(fileName);
+void MockCamera::saveBuffer(const QString& filename) {
+	if (QFile::exists(filename))
+		QFile::remove(filename);
+	packaged_task<bool(QString)> task{ [&](const QString& fn) -> bool {
+		mutex m;
+		m.lock();
+		auto im = m_buffer.copy();
+		m.unlock();
+		return im.save(fn);
+	} };
+	task(filename);
 }
 
 void MockCamera::imageProc() {
@@ -243,7 +252,6 @@ void ToupCamera::capture(int resolution, const QString& filename)
 
 void ToupCamera::saveBuffer(const QString& filename)
 {
-	using namespace std;	
 	if (QFile::exists(filename))
 		QFile::remove(filename);
 	packaged_task<bool(QString)> task{ [&](const QString& fn) -> bool {

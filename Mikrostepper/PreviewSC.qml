@@ -6,13 +6,13 @@ Dialog {
     id: root
     width: 640
     height: 480
-    property ListModel imageModel: immodel
+    property alias imageModel: immodel
     property int totalCount: 9999
 
     Connections {
         target: optilab
         onImageSaved: {
-            immodel.append({"imageFile": Qt.resolvedUrl(imgPath)})
+            immodel.append({"imageFile": imgPath})
             pathView1.incrementCurrentIndex()
         }
     }
@@ -43,9 +43,6 @@ Dialog {
             orientation: Qt.Horizontal
             snapMode: ListView.SnapOneItem
             clip: true
-            displaced: Transition {
-                NumberAnimation { properties: "x"; duration: 10 }
-            }
 
             model: immodel
             delegate: Component {
@@ -53,7 +50,7 @@ Dialog {
                     width: pathView1.width
                     height: pathView1.height
                     fillMode: Image.PreserveAspectFit
-                    source: Qt.resolvedUrl(imageFile.toString())
+                    source: optilab.fromLocalFile(imageFile)
                     anchors.verticalCenter: parent.verticalCenter
                     mipmap: true
                     asynchronous: true
@@ -67,7 +64,7 @@ Dialog {
             title: "Select Folder"
             onAccepted: {
                 for (var i = 0; i < immodel.count; ++i) {
-                    var name = immodel.get(i).imageFile
+                    var name = optilab.fromLocalFile(immodel.get(i).imageFile)
                     optilab.copyToFolder(name, folder)
                 }
                 imageModel.clear()

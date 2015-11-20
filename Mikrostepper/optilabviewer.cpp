@@ -236,3 +236,23 @@ void OptilabViewer::stopPreciseTimer()
 	m_timer.stop();
 	emit scRunningChanged(false);
 }
+
+QString OptilabViewer::currentPath()
+{
+	return QDir::currentPath();
+}
+
+QString OptilabViewer::homePath()
+{
+	return QDir::homePath();
+}
+
+QString OptilabViewer::tempPath()
+{
+	return QDir::tempPath();
+}
+
+QString OptilabViewer::rootPath()
+{
+	return QDir::rootPath();
+}

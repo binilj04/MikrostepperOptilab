@@ -106,6 +106,59 @@ protected:
 
 };
 
+class DSCameraProp : public NullCamProp
+{
+	Q_OBJECT
+public:
+	DSCameraProp(QObject* parent = nullptr);
+	~DSCameraProp();
+
+	double saturation() const;
+	void setSaturation(double val);
+	double contrast() const;
+	void setContrast(double);
+	double gamma() const;
+	void setGamma(double val);
+
+	bool autoexposure() const;
+	void setAutoexposure(bool);
+	double aeGain() const;
+	void setAeGain(double val);
+	double exposureTime() const;
+	void setExposureTime(double);
+	double aeTarget() const;
+	void setAeTarget(double);
+	double maxExposureTime();
+
+	double rGain() const;
+	void setRGain(double val);
+	double gGain() const;
+	void setGGain(double val);
+	double bGain() const;
+	void setBGain(double val);
+
+	bool isColor() const;
+	void setColorMode(bool);
+	bool isHFlip() const;
+	void setHFlip(bool);
+	bool isVFlip() const;
+	void setVFlip(bool);
+
+	int frameRate() const;
+	void setFrameRate(int);
+
+public slots:
+	void oneShotWB();
+
+	void loadDefaultParameters();
+
+	CameraType cameraType() const;
+
+private:
+	void reloadParams();
+};
+
+// ToupCamera
 class ToupCamera : public Camera
 {
 	Q_OBJECT
@@ -200,6 +253,8 @@ public slots:
 	void oneShotWB();
 
 	void loadDefaultParameters();
+
+	CameraType cameraType() const;
 };
 
 /*

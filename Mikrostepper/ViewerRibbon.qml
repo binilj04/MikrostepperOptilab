@@ -15,6 +15,7 @@ Rectangle {
 
     property bool _lastAE
     property real _lastExpTime
+    property int _lastFps
     property int _scCount: 0
     property int _interval: 0
     property bool isSCOn: _scCount > 0
@@ -36,6 +37,11 @@ Rectangle {
         _lastExpTime = camprop.exposureTime
         var et = _lastExpTime / 2.295
         camprop.exposureTime = et
+        if (camprop.cameraType() === 1)
+        {
+            _lastFps = camprop.frameRate
+            camprop.frameRate = 0
+        }
         captureTimer.start()
     }
 
@@ -44,14 +50,15 @@ Rectangle {
         interval: 100
         onTriggered: {
             optilab.captureToTemp("swrdaol.jpg")
-            camprop.exposureTime = _lastExpTime
-            camprop.autoexposure = _lastAE
         }
     }
 
     Connections {
         target: optilab
         onCaptureReady: {
+            camprop.exposureTime = _lastExpTime
+            camprop.autoexposure = _lastAE
+            camprop.frameRate = _lastFps
             preview1.source = filename
             preview1.open()
         }
@@ -117,7 +124,9 @@ Rectangle {
         contentItem: PreviewImage {
             id: singlePreview
             onAccept: {
-                optilab.scaleImage("swrdaol.jpg", 4100, 3075)
+                var imsize = optilab.imageSize("swrdaol.jpg")
+                if (imsize.width * imsize.height < 4100 * 3075)
+                    optilab.scaleImage("swrdaol.jpg", 4100, 3075)
                 optilab.copyFromTemp("swrdaol.jpg", preview1.savePath)
                 preview1.source = ""
                 preview1.hide()

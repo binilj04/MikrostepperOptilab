@@ -2,6 +2,12 @@
 #include "toupwrapper.h"
 using namespace std;
 
+Image::Image()
+	: width{ 1 }, height{ 1 }, channel{ 1 }, m_buffer{ new uchar[1] }
+{
+
+}
+
 Image::Image(int w, int h, int c)
 	: width{ w }, height{ h }, channel{ c }, m_buffer{ new uchar[w * h * c] }
 { }
@@ -75,13 +81,16 @@ ToupWrapper::ToupWrapper(QObject* parent)
 	init();
 	start();
 	auto res = sizes();
-	size_t select;
-	for (size_t i = res.size() - 1; i >= 0; --i)
+	size_t select = 0;
+	if (isAvailable())
 	{
-		if (res.at(i).width() * res.at(i).height() > 1000000)
+		for (size_t i = res.size() - 1; i >= 0; --i)
 		{
-			select = i;
-			break;
+			if (res.at(i).width() * res.at(i).height() > 1000000)
+			{
+				select = i;
+				break;
+			}
 		}
 	}
 	setResolution(select);
@@ -221,6 +230,7 @@ QSize ToupWrapper::size() const
 vector<QSize> ToupWrapper::sizes()
 {
 	vector<QSize> res;
+	if (!isAvailable()) return res;
 	auto model = arrinst[0].model;
 	size_t cnt = model->preview;
 	for (auto i = 0u; i < cnt; ++i)

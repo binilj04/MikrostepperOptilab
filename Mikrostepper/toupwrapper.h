@@ -9,7 +9,7 @@
 class Image
 {
 public:
-	Image() = default;
+	Image();
 	Image(int w, int h, int c);
 	~Image();
 

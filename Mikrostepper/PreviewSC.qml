@@ -8,19 +8,33 @@ Dialog {
     height: 480
     property alias imageModel: immodel
     property int totalCount: 9999
+    property int current: -1
 
     Connections {
         target: optilab
         onImageSaved: {
             immodel.append({"imageFile": imgPath})
-            pathView1.incrementCurrentIndex()
+            current += 1
         }
+    }
+
+    onCurrentChanged: {
+        if (current < 0) return
+        var img = immodel.get(current).imageFile
+        if (optilab.exists(img))
+            view.source = optilab.fromLocalFile(img)
     }
 
     onVisibleChanged: {
         if (!visible) {
             immodel.clear()
+            current = -1
+            view.source = ""
         }
+    }
+
+    ListModel {
+        id: immodel
     }
 
     contentItem: Rectangle {
@@ -28,34 +42,18 @@ Dialog {
         width: 640
         height: 480
 
-        ListModel {
-            id: immodel
-        }
-
-        ListView {
-            id: pathView1
+        Image {
+            id: view
             width: parent.width / 1.25
-            anchors.bottom: buttonSave.top
+            anchors.bottom: indicator.top
             anchors.bottomMargin: 10
             anchors.top: parent.top
             anchors.topMargin: 30
             anchors.horizontalCenter: parent.horizontalCenter
-            orientation: Qt.Horizontal
-            snapMode: ListView.SnapOneItem
-            clip: true
 
-            model: immodel
-            delegate: Component {
-                Image {
-                    width: pathView1.width
-                    height: pathView1.height
-                    fillMode: Image.PreserveAspectFit
-                    source: optilab.fromLocalFile(imageFile)
-                    anchors.verticalCenter: parent.verticalCenter
-                    mipmap: true
-                    asynchronous: true
-                }
-            }
+            fillMode: Image.PreserveAspectFit
+            mipmap: true
+            asynchronous: true
         }
 
         FileDialog {
@@ -72,12 +70,21 @@ Dialog {
             }
         }
 
+        TextRegular {
+            id: indicator
+            anchors {
+                bottom: buttonSave.top; bottomMargin: 10
+                horizontalCenter: view.horizontalCenter
+            }
+            text: "%1/%2".arg(current + 1).arg(totalCount)
+        }
+
         ButtonSimple {
             id: buttonCancel
             text: "Cancel"
             tooltip: "Cancel capture operation and discard images"
             anchors.bottom: parent.bottom
-            anchors.bottomMargin: 30
+            anchors.bottomMargin: 20
             anchors.horizontalCenterOffset: 1.5*width
             anchors.horizontalCenter: parent.horizontalCenter
             drawBorder: true
@@ -93,7 +100,7 @@ Dialog {
             tooltip: "Save images to disk"
             visible: (immodel.count == totalCount)
             anchors.bottom: parent.bottom
-            anchors.bottomMargin: 30
+            anchors.bottomMargin: 20
             anchors.horizontalCenterOffset: -1.5 * width
             anchors.horizontalCenter: parent.horizontalCenter
             drawBorder: true
@@ -110,7 +117,7 @@ Dialog {
             anchors.leftMargin: 10
             anchors.verticalCenter: parent.verticalCenter
             rotation: 180
-            onClicked: pathView1.decrementCurrentIndex()
+            onClicked: if (current > 0) current -= 1
         }
 
         ToolButton {
@@ -120,7 +127,7 @@ Dialog {
             anchors.right: parent.right
             anchors.rightMargin: 10
             anchors.verticalCenter: parent.verticalCenter
-            onClicked: pathView1.incrementCurrentIndex()
+            onClicked: if (current < totalCount - 1) current += 1
         }
     }
 }

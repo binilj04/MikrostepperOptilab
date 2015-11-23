@@ -51,6 +51,9 @@ Rectangle {
         anchors.bottomMargin: 10
         anchors.left: parent.left
         anchors.leftMargin: 25
+
+        sourceSize.width: width
+        sourceSize.height: height
     }
 
     ButtonSimple {

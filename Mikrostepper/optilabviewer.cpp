@@ -256,3 +256,8 @@ QString OptilabViewer::rootPath()
 {
 	return QDir::rootPath();
 }
+
+bool OptilabViewer::exists(const QString& file)
+{
+	return QFile::exists(file);
+}

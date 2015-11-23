@@ -77,6 +77,8 @@ public slots:
 	QString tempPath();
 	QString rootPath();
 
+	bool exists(const QString& file);
+
 private:
     Camera* m_camera;
 

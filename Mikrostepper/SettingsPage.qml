@@ -177,6 +177,7 @@ Rectangle {
 
                         Rectangle {
                             id: wbRect
+                            visible: camprop.cameraType() === 2
                             anchors {
                                 top: anchTL.top; left: anchTL.left
                                 bottom: anchBR.bottom; right: anchBR.right
@@ -355,6 +356,7 @@ Rectangle {
 
                         Text {
                             id: wbText
+                            visible: camprop.cameraType() === 2
                             text: "White Balance"
                             anchors.left: wbRect.left
                             anchors.top: wbRect.bottom
@@ -390,11 +392,13 @@ Rectangle {
                         }
 
                         TextRegular {
+                            visible: camprop.cameraType() === 2
                             text: "Hue: %1".arg(Math.round(sliderHue.value))
                         }
 
                         KeySlider {
                             id: sliderHue
+                            visible: camprop.cameraType() === 2
                             minimumValue: -180
                             maximumValue: 180
                             stepSize: 1
@@ -416,11 +420,13 @@ Rectangle {
                         }
 
                         TextRegular {
+                            visible: camprop.cameraType() === 2
                             text: "Brightness: %1".arg(Math.round(sliderBrightness.value))
                         }
 
                         KeySlider {
                             id: sliderBrightness
+                            visible: camprop.cameraType() === 2
                             minimumValue: -64
                             maximumValue: 64
                             stepSize: 1
@@ -519,16 +525,19 @@ Rectangle {
 
                         TextBlack {
                             id: textBlack3
+                            visible: camprop.cameraType() === 2
                             text: "Manual White Balance"
                             font.pointSize: 10
                         }
 
                         TextRegular {
+                            visible: camprop.cameraType() === 2
                             text: "Temperature: %1".arg(Math.round(sliderTemperature.value))
                         }
 
                         KeySlider {
                             id: sliderTemperature
+                            visible: camprop.cameraType() === 2
                             minimumValue: 2000
                             maximumValue: 15000
                             Layout.alignment: Qt.AlignCenter
@@ -536,11 +545,13 @@ Rectangle {
                         }
 
                         TextRegular {
+                            visible: camprop.cameraType() === 2
                             text: "Tint: %1".arg(Math.round(sliderTint.value))
                         }
 
                         KeySlider {
                             id: sliderTint
+                            visible: camprop.cameraType() === 2
                             minimumValue: 200
                             maximumValue: 2500
                             stepSize: 1
@@ -561,7 +572,7 @@ Rectangle {
                             id: sliderFrameRate
                             property string label: "Slowest"
                             minimumValue: 0
-                            maximumValue: 3
+                            maximumValue: (camprop.cameraType() === 2) ? 3 : 2
                             stepSize: 1
                             Layout.alignment: Qt.AlignCenter
                             onValueChanged: {
@@ -620,6 +631,7 @@ Rectangle {
                         }
 
                         TextRegular {
+                            visible: camprop.cameraType() === 2
                             text: "Sampling method"
                         }
 
@@ -627,6 +639,7 @@ Rectangle {
 
                         RadioButton {
                             id: checkBoxBin
+                            visible: camprop.cameraType() === 2
                             text: "Bin (better image, slower)"
                             exclusiveGroup: isBinGroup
                             onCheckedChanged: camprop.isBin = checked
@@ -634,6 +647,7 @@ Rectangle {
 
                         RadioButton {
                             id: checkBoxSkip
+                            visible: camprop.cameraType() === 2
                             text: "Skip (fast)"
                             exclusiveGroup: isBinGroup
                         }

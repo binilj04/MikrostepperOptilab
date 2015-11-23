@@ -130,15 +130,12 @@ QSize DSCamera::size() const {
 
 void DSCamera::setResolution(int res) {
 	deinitialize();
-	bool status = CameraInit(SnapThreadCallback, (DS_RESOLUTION)res, 0, 1, 0);
+	bool status = CameraInit(SnapThreadCallback, (DS_RESOLUTION)res, 0, 1, 0) == DS_CAMERA_STATUS::STATUS_OK;
 	if (status) {
 		m_resolution = res;
 		CameraSetB2RGBMode(DS_B2RGB_MODE::B2RGB_MODE_LINE);
 		CameraSetColorEnhancement(TRUE);
 		CameraSetLightFrquency(DS_LIGHT_FREQUENCY::LIGHT_FREQUENCY_60HZ);
-		CameraSetFrameSpeed(DS_FRAME_SPEED::FRAME_SPEED_SUPER);
-		CameraSetMirror(DS_MIRROR_DIRECTION::MIRROR_DIRECTION_HORIZONTAL, FALSE);
-		CameraSetMirror(DS_MIRROR_DIRECTION::MIRROR_DIRECTION_VERTICAL, FALSE);
 		CameraPlay();
 		int W, H;
 		CameraGetImageSize(&W, &H);
@@ -148,6 +145,12 @@ void DSCamera::setResolution(int res) {
 
 		recorder.frameSize = cv::Size(W, H);
 	}
+	else
+	{
+		m_available = false;
+		CameraStop();
+		CameraUnInit();
+	}
 }
 
 void DSCamera::initialize() {
@@ -156,8 +159,6 @@ void DSCamera::initialize() {
 }
 
 void DSCamera::deinitialize() {
-	CameraSetMirror(DS_MIRROR_DIRECTION::MIRROR_DIRECTION_HORIZONTAL, FALSE);
-	CameraSetMirror(DS_MIRROR_DIRECTION::MIRROR_DIRECTION_VERTICAL, FALSE);
 	CameraStop();
 	CameraUnInit();
 }
@@ -177,6 +178,7 @@ void DSCamera::capture(int res, const QString &fileName) {
 	}
 	else
 		QFile::copy("Z.png", fileName);
+	emit captureReady(fileName);
 }
 
 void DSCamera::saveBuffer(const QString& fileName) {
@@ -219,6 +221,266 @@ double DSCamera::focusValue() {
 	//cout << duration_cast<microseconds>(elapsed).count() << " us\n";
 	//cout << res << "\n";
 	return res;
+}
+
+//DSCameraProp implementation
+DSCameraProp::DSCameraProp(QObject* parent)
+	: NullCamProp(parent)
+{
+	reloadParams();
+}
+
+DSCameraProp::~DSCameraProp()
+{
+}
+
+double DSCameraProp::rGain() const {
+	int rg, gg, bg;
+	CameraGetGain(&rg, &gg, &bg);
+    return rg;
+}
+
+void DSCameraProp::setRGain(double val) {
+	int rg, gg, bg;
+	CameraGetGain(&rg, &gg, &bg);
+    if (rg != int(val)) {
+		rg = int(val);
+		CameraSetGain(rg, gg, bg);
+        emit rGainChanged(val);
+    }
+}
+
+double DSCameraProp::gGain() const {
+	int rg, gg, bg;
+	CameraGetGain(&rg, &gg, &bg);
+	return 1.0 * gg;
+}
+
+void DSCameraProp::setGGain(double val) {
+	int rg, gg, bg;
+	CameraGetGain(&rg, &gg, &bg);
+	if (gg != int(val)) {
+		gg = int(val);
+		CameraSetGain(rg, gg, bg);
+		emit rGainChanged(val);
+	}
+}
+
+double DSCameraProp::bGain() const {
+	int rg, gg, bg;
+	CameraGetGain(&rg, &gg, &bg);
+	return 1.0 * bg;
+}
+
+void DSCameraProp::setBGain(double val) {
+	int rg, gg, bg;
+	CameraGetGain(&rg, &gg, &bg);
+	if (bg != int(val)) {
+		bg = int(val);
+		CameraSetGain(rg, gg, bg);
+		emit rGainChanged(val);
+	}
+}
+
+double DSCameraProp::gamma() const {
+	uchar ga;
+	CameraGetGamma(&ga);
+	return 1.0 * ga;
+}
+
+void DSCameraProp::setGamma(double val) {
+    if (gamma() != val) {
+		CameraSetGamma((uchar)val);
+        emit gammaChanged(val);
+    }
+}
+
+double DSCameraProp::contrast() const {
+	uchar cont;
+	CameraGetContrast(&cont);
+	return 1.0 * cont;
+}
+
+void DSCameraProp::setContrast(double val) {
+    if (contrast() != val) {
+		CameraSetContrast((uchar)val);
+        emit contrastChanged(val);
+    }
+}
+
+double DSCameraProp::saturation() const {
+	uchar sat;
+	CameraGetSaturation(&sat);
+	return 1.0 * sat;
+}
+
+void DSCameraProp::setSaturation(double val) {
+    if (saturation() != val) {
+		CameraSetSaturation((uchar)val);
+        emit saturationChanged(val);
+    }
+}
+
+bool DSCameraProp::autoexposure() const {
+	BOOL AE;
+	CameraGetAeState(&AE);
+	return (AE == TRUE);
+}
+
+void DSCameraProp::setAutoexposure(bool val) {
+    if (autoexposure() != val) {
+		BOOL v = val ? TRUE : FALSE;
+		CameraSetAeState(v);
+        emit autoexposureChanged(val);
+		emit aeGainChanged(aeGain());
+		emit aeTargetChanged(aeTarget());
+		emit exposureTimeChanged(exposureTime());
+    }
+}
+
+double DSCameraProp::aeGain() const {
+	ushort AEG;
+	CameraGetAnalogGain(&AEG);
+	return 1.0 * AEG;
+}
+
+void DSCameraProp::setAeGain(double val) {
+    if (aeGain() != val) {
+		CameraSetAnalogGain((ushort)val);
+        emit aeGainChanged(val);
+    }
+}
+
+double DSCameraProp::exposureTime() const {
+	int tm;
+	CameraGetExposureTime(&tm);
+	return 1.0 * tm;
+}
+
+double DSCameraProp::maxExposureTime() {
+	ushort tmx;
+	CameraGetMaxExposureTime(&tmx);
+	return 1.0 * tmx;
+}
+
+void DSCameraProp::setExposureTime(double val) {
+    if (exposureTime() != val) {
+		CameraSetExposureTime((int)val);
+        emit exposureTimeChanged(val);
+    }
+}
+
+double DSCameraProp::aeTarget() const {
+	uchar tgt;
+	CameraGetAeTarget(&tgt);
+	return 1.0 * tgt;
+}
+
+void DSCameraProp::setAeTarget(double val) {
+    if (aeTarget() != val) {
+		CameraSetAeTarget((uchar)val);
+        emit aeTargetChanged(val);
+    }
+}
+
+void DSCameraProp::oneShotWB() {
+	CameraSetAWBState(TRUE);
+}
+
+bool DSCameraProp::isColor() const
+{
+	BOOL enable;
+	CameraGetMonochrome(&enable);
+	return enable == FALSE;
+}
+
+void DSCameraProp::setColorMode(bool enable)
+{
+	if (enable != isColor())
+	{
+		CameraSetMonochrome(!enable);
+		emit isColorChanged(enable);
+	}
+}
+
+bool DSCameraProp::isHFlip() const
+{
+	BOOL flip;
+	CameraGetMirror(DS_MIRROR_DIRECTION::MIRROR_DIRECTION_HORIZONTAL, &flip);
+	return flip == TRUE;
+}
+
+void DSCameraProp::setHFlip(bool flip)
+{
+	if (flip != isHFlip())
+	{
+		CameraSetMirror(DS_MIRROR_DIRECTION::MIRROR_DIRECTION_HORIZONTAL, flip);
+		emit isHFlipChanged(flip);
+	}
+}
+
+bool DSCameraProp::isVFlip() const
+{
+	BOOL flip;
+	CameraGetMirror(DS_MIRROR_DIRECTION::MIRROR_DIRECTION_VERTICAL, &flip);
+	return flip == TRUE;
+}
+
+void DSCameraProp::setVFlip(bool flip)
+{
+	if (flip != isVFlip())
+	{
+		CameraSetMirror(DS_MIRROR_DIRECTION::MIRROR_DIRECTION_VERTICAL, flip);
+		emit isVFlipChanged(flip);
+	}
+}
+
+int DSCameraProp::frameRate() const
+{
+	uchar pt;
+	CameraGetFrameSpeed(&pt);
+	return pt;
+}
+
+void DSCameraProp::setFrameRate(int speed)
+{
+	if (speed != frameRate())
+	{
+		auto spd = (speed < 0) ? 0 : (speed > 2) ? 2 : speed;
+		CameraSetFrameSpeed(static_cast<DS_FRAME_SPEED>(spd));
+		emit frameRateChanged(spd);
+	}
+}
+
+void DSCameraProp::reloadParams() 
+{
+	CameraSetB2RGBMode(DS_B2RGB_MODE::B2RGB_MODE_LINE);
+	CameraSetColorEnhancement(TRUE);
+	CameraSetLightFrquency(DS_LIGHT_FREQUENCY::LIGHT_FREQUENCY_60HZ);
+	CameraSetFrameSpeed(DS_FRAME_SPEED::FRAME_SPEED_NORMAL);
+	CameraSetMirror(DS_MIRROR_DIRECTION::MIRROR_DIRECTION_HORIZONTAL, FALSE);
+	CameraSetMirror(DS_MIRROR_DIRECTION::MIRROR_DIRECTION_VERTICAL, FALSE);
+	emit rGainChanged(rGain());
+	emit gGainChanged(gGain());
+	emit bGainChanged(bGain());
+	emit gammaChanged(gamma());
+	emit contrastChanged(contrast());
+	emit saturationChanged(saturation());
+	emit autoexposureChanged(autoexposure());
+	emit aeGainChanged(aeGain());
+	emit aeTargetChanged(aeTarget());
+	emit exposureTimeChanged(exposureTime());
+}
+
+void DSCameraProp::loadDefaultParameters()
+{
+	CameraLoadDefault();
+	reloadParams();
+}
+
+CamProp::CameraType DSCameraProp::cameraType() const
+{
+	return DS;
 }
 
 //ToupCamera implementation
@@ -633,6 +895,11 @@ void ToupCameraProp::loadDefaultParameters()
 	setVFlip(false);
 	setSamplingMode(true);
 	setWhiteBalanceBox(QRectF{ 50.0, 50.0, 50.0, 50.0 }.toRect());
+}
+
+CamProp::CameraType ToupCameraProp::cameraType() const
+{
+	return Toup;
 }
 
 //QuickCam implementation

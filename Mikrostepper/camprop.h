@@ -78,6 +78,11 @@ public:
 	virtual QRect whiteBalanceBox() const = 0;
 	virtual void setWhiteBalanceBox(const QRect&) = 0;
 
+	enum CameraType {
+		Mock, DS, Toup
+	};
+	Q_ENUMS(CameraType)
+
 signals:
 	void hueChanged(double);
 	void saturationChanged(double);
@@ -117,6 +122,8 @@ public slots:
 	virtual void reloadParams();
 
 	virtual int getCurrentParameterTeam();
+
+	virtual CameraType cameraType() const = 0;
 
 private:
 	void saveParameter(int id);
@@ -178,6 +185,8 @@ public:
 
 	QRect whiteBalanceBox() const;
 	void setWhiteBalanceBox(const QRect& r);
+	
+	CameraType cameraType() const;
 
 public slots:
 	void oneShotWB();

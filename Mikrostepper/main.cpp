@@ -17,7 +17,7 @@
 
 using namespace std;
 
-#define MOCK_CAM
+//#define CAM_TYPE 3
 
 int main(int argc, char *argv[])
 {
@@ -28,21 +28,45 @@ int main(int argc, char *argv[])
     AppSettings settings;
 	settings.updateCNCSettings();
 	vector<unique_ptr<CamProp>> vprop;
-#ifdef MOCK_CAM
-	MockCamera camera;
-	vprop.emplace_back(new NullCamProp(&camera));
-#else
-    ToupCamera camera;
-	if (camera.isAvailable())
-		vprop.emplace_back(new ToupCameraProp(camera.wrapper()));
+//#if CAM_TYPE == 0
+//	MockCamera camera;
+//	vprop.emplace_back(new NullCamProp(&camera));
+//#elif CAM_TYPE == 1
+//	DSCamera camera;
+//	vprop.emplace_back(new DSCameraProp(&camera));
+//#else
+//    ToupCamera camera;
+//	if (camera.isAvailable())
+//		vprop.emplace_back(new ToupCameraProp(camera.wrapper()));
+//	else
+//		vprop.emplace_back(new NullCamProp(&camera));
+//#endif
+	Camera* camera = new ToupCamera();
+	if (camera->isAvailable())
+	{
+		vprop.emplace_back(new ToupCameraProp(dynamic_cast<ToupCamera*>(camera)->wrapper()));
+	}
 	else
-		vprop.emplace_back(new NullCamProp(&camera));
-#endif
-    OptilabViewer ov(&camera);
-    QQmlApplicationEngine engine(&camera);
+	{
+		delete camera;
+		camera = new DSCamera();
+		if (camera->isAvailable())
+		{
+			vprop.emplace_back(new DSCameraProp(camera));
+		}
+		else
+		{
+			delete camera;
+			camera = new MockCamera();
+			vprop.emplace_back(new NullCamProp(camera));
+		}
+	}
+
+    OptilabViewer ov(camera);
+    QQmlApplicationEngine engine(camera);
     auto ctx = engine.rootContext();
     ctx->setContextProperty("appsettings", &settings);
-    ctx->setContextProperty("camera", &camera);
+    ctx->setContextProperty("camera", camera);
     ctx->setContextProperty("optilab", &ov);
     ctx->setContextProperty("camprop", vprop.at(0).get());
 

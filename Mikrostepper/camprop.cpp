@@ -368,3 +368,7 @@ void NullCamProp::loadDefaultParameters()
 {
 }
 
+CamProp::CameraType NullCamProp::cameraType() const
+{
+	return Mock;
+}

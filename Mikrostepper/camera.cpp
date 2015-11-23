@@ -164,21 +164,24 @@ void DSCamera::deinitialize() {
 }
 
 void DSCamera::capture(int res, const QString &fileName) {
-	LPCTSTR fn = L"Z";
-	if (CameraCaptureFile(fn, FILE_PNG, 80, (DS_RESOLUTION)res) != STATUS_OK)
-		return;
-	if (QFile::exists(fileName))
-		QFile::remove(fileName);
-	if (fileName.contains(".png"))
-		QFile::copy("Z.png", fileName);
-	else if (fileName.contains(".jpg") || fileName.contains(".bmp")) {
-		QImage zz("Z.png");
-		bool success = zz.save(fileName);
-		if (!success) QFile::copy("Z.png", fileName);
-	}
-	else
-		QFile::copy("Z.png", fileName);
-	emit captureReady(fileName);
+	auto job = [&](int res, const QString& fileName) {
+		LPCTSTR fn = L"Z";
+		if (CameraCaptureFile(fn, FILE_PNG, 80, (DS_RESOLUTION)res) != STATUS_OK)
+			return;
+		if (QFile::exists(fileName))
+			QFile::remove(fileName);
+		if (fileName.contains(".png"))
+			QFile::copy("Z.png", fileName);
+		else if (fileName.contains(".jpg") || fileName.contains(".bmp")) {
+			QImage zz("Z.png");
+			bool success = zz.save(fileName);
+			if (!success) QFile::copy("Z.png", fileName);
+		}
+		else
+			QFile::copy("Z.png", fileName);
+		emit captureReady(fileName);
+	};
+	async(launch::async, job, res, fileName);
 }
 
 void DSCamera::saveBuffer(const QString& fileName) {

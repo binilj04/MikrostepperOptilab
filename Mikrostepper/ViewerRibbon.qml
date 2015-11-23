@@ -42,6 +42,7 @@ Rectangle {
             _lastFps = camprop.frameRate
             camprop.frameRate = 0
         }
+        waitSingleCapture.open()
         captureTimer.start()
     }
 
@@ -53,9 +54,17 @@ Rectangle {
         }
     }
 
+    MessageDialog {
+        id: waitSingleCapture
+        standardButtons: Qt.NoButton
+        title: "Capturing"
+        text: "High-res capture. Please wait. . ."
+    }
+
     Connections {
         target: optilab
         onCaptureReady: {
+            waitSingleCapture.close()
             camprop.exposureTime = _lastExpTime
             camprop.autoexposure = _lastAE
             camprop.frameRate = _lastFps

@@ -372,3 +372,18 @@ CamProp::CameraType NullCamProp::cameraType() const
 {
 	return Mock;
 }
+
+double NullCamProp::controlMin(const QString& control) const
+{
+	return 0;
+}
+
+double NullCamProp::controlMax(const QString& control) const
+{
+	return 100;
+}
+
+bool NullCamProp::controlAvailable(const QString& control) const
+{
+	return false;
+}

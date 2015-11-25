@@ -28,19 +28,7 @@ int main(int argc, char *argv[])
     AppSettings settings;
 	settings.updateCNCSettings();
 	vector<unique_ptr<CamProp>> vprop;
-//#if CAM_TYPE == 0
-//	MockCamera camera;
-//	vprop.emplace_back(new NullCamProp(&camera));
-//#elif CAM_TYPE == 1
-//	DSCamera camera;
-//	vprop.emplace_back(new DSCameraProp(&camera));
-//#else
-//    ToupCamera camera;
-//	if (camera.isAvailable())
-//		vprop.emplace_back(new ToupCameraProp(camera.wrapper()));
-//	else
-//		vprop.emplace_back(new NullCamProp(&camera));
-//#endif
+
 	Camera* camera = new ToupCamera();
 	if (camera->isAvailable())
 	{

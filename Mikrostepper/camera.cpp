@@ -133,9 +133,6 @@ void DSCamera::setResolution(int res) {
 	bool status = CameraInit(SnapThreadCallback, (DS_RESOLUTION)res, 0, 1, 0) == DS_CAMERA_STATUS::STATUS_OK;
 	if (status) {
 		m_resolution = res;
-		CameraSetB2RGBMode(DS_B2RGB_MODE::B2RGB_MODE_LINE);
-		CameraSetColorEnhancement(TRUE);
-		CameraSetLightFrquency(DS_LIGHT_FREQUENCY::LIGHT_FREQUENCY_60HZ);
 		CameraPlay();
 		int W, H;
 		CameraGetImageSize(&W, &H);
@@ -230,6 +227,26 @@ double DSCamera::focusValue() {
 DSCameraProp::DSCameraProp(QObject* parent)
 	: NullCamProp(parent)
 {
+	min["gamma"] = 10;
+	max["gamma"] = 250;
+	min["saturation"] = 0;
+	max["saturation"] = 255;
+	min["contrast"] = 0;
+	max["contrast"] = 100;
+	min["aetarget"] = 50;
+	max["aetarget"] = 200;
+	min["aeexposure"] = 0.001;
+	max["aeexposure"] = 4;
+	min["aegain"] = 1;
+	max["aegain"] = 80;
+	min["red"] = 10;
+	max["red"] = 255;
+	min["green"] = 10;
+	max["green"] = 255;
+	min["blue"] = 10;
+	max["blue"] = 255;
+	min["framerate"] = 0;
+	max["framerate"] = 1;
 	reloadParams();
 }
 
@@ -449,7 +466,7 @@ void DSCameraProp::setFrameRate(int speed)
 {
 	if (speed != frameRate())
 	{
-		auto spd = (speed < 0) ? 0 : (speed > 2) ? 2 : speed;
+		auto spd = (speed == 0) ? 0 : 2;
 		CameraSetFrameSpeed(static_cast<DS_FRAME_SPEED>(spd));
 		emit frameRateChanged(spd);
 	}
@@ -457,12 +474,7 @@ void DSCameraProp::setFrameRate(int speed)
 
 void DSCameraProp::reloadParams() 
 {
-	CameraSetB2RGBMode(DS_B2RGB_MODE::B2RGB_MODE_LINE);
-	CameraSetColorEnhancement(TRUE);
-	CameraSetLightFrquency(DS_LIGHT_FREQUENCY::LIGHT_FREQUENCY_60HZ);
-	CameraSetFrameSpeed(DS_FRAME_SPEED::FRAME_SPEED_NORMAL);
-	CameraSetMirror(DS_MIRROR_DIRECTION::MIRROR_DIRECTION_HORIZONTAL, FALSE);
-	CameraSetMirror(DS_MIRROR_DIRECTION::MIRROR_DIRECTION_VERTICAL, FALSE);
+	setFrameRate(0);
 	emit rGainChanged(rGain());
 	emit gGainChanged(gGain());
 	emit bGainChanged(bGain());
@@ -475,15 +487,83 @@ void DSCameraProp::reloadParams()
 	emit exposureTimeChanged(exposureTime());
 }
 
+void DSCameraProp::saveParametersA()
+{
+	CameraSaveParameter(PARAMETER_TEAM_A);
+}
+
+void DSCameraProp::loadParametersA()
+{
+	CameraReadParameter(PARAMETER_TEAM_A);
+}
+
+void DSCameraProp::saveParametersB()
+{
+	CameraSaveParameter(PARAMETER_TEAM_B);
+}
+
+void DSCameraProp::loadParametersB()
+{
+	CameraReadParameter(PARAMETER_TEAM_B);
+}
+
+void DSCameraProp::saveParametersC()
+{
+	CameraSaveParameter(PARAMETER_TEAM_C);
+}
+
+void DSCameraProp::loadParametersC()
+{
+	CameraReadParameter(PARAMETER_TEAM_C);
+}
+
+void DSCameraProp::saveParametersD()
+{
+	CameraSaveParameter(PARAMETER_TEAM_D);
+}
+
+void DSCameraProp::loadParametersD()
+{
+	CameraReadParameter(PARAMETER_TEAM_D);
+}
+
 void DSCameraProp::loadDefaultParameters()
 {
 	CameraLoadDefault();
 	reloadParams();
 }
 
+int DSCameraProp::getCurrentParameterTeam()
+{
+	uchar p;
+	CameraGetCurrentParameterTeam(&p);
+	return p;
+}
+
 CamProp::CameraType DSCameraProp::cameraType() const
 {
 	return DS;
+}
+
+double DSCameraProp::controlMin(const QString& control) const
+{
+	if (min.find(control) != end(min))
+		return min.at(control);
+	return 0;
+}
+
+double DSCameraProp::controlMax(const QString& control) const
+{
+	if (max.find(control) != end(max))
+		return max.at(control);
+	return 100;
+}
+
+bool DSCameraProp::controlAvailable(const QString& control) const
+{
+	if (max.find(control) != end(max))
+		return true;
+	return false;
 }
 
 //ToupCamera implementation
@@ -574,7 +654,28 @@ ToupWrapper* ToupCamera::wrapper()
 ToupCameraProp::ToupCameraProp(ToupWrapper* camera)
 	: CamProp{ camera }, cam{ camera }
 {
-
+	min["hue"] = -180;
+	max["hue"] = 180;
+	min["saturation"] = 0;
+	max["saturation"] = 255;
+	min["brightness"] = -64;
+	max["brightness"] = 64;
+	min["gamma"] = 10;
+	max["gamma"] = 250;
+	min["contrast"] = 1;
+	max["contrast"] = 100;
+	min["aetarget"] = 16;
+	max["aetarget"] = 235;
+	min["aeexposure"] = 0.1;
+	max["aeexposure"] = 2000;
+	min["aegain"] = 100;
+	max["aegain"] = 500;
+	min["awbtemp"] = 2000;
+	max["awbtemp"] = 15000;
+	min["awbtint"] = 200;
+	max["awbtint"] = 2500;
+	min["framerate"] = 0;
+	max["framerate"] = 3;
 }
 
 ToupCameraProp::~ToupCameraProp()
@@ -904,6 +1005,28 @@ CamProp::CameraType ToupCameraProp::cameraType() const
 {
 	return Toup;
 }
+
+double ToupCameraProp::controlMin(const QString& control) const
+{
+	if (min.find(control) != end(min))
+		return min.at(control);
+	return 0;
+}
+
+double ToupCameraProp::controlMax(const QString& control) const
+{
+	if (max.find(control) != end(max))
+		return max.at(control);
+	return 100;
+}
+
+bool ToupCameraProp::controlAvailable(const QString& control) const
+{
+	if (max.find(control) != end(max))
+		return true;
+	return false;
+}
+
 
 //QuickCam implementation
 QuickCam::QuickCam(QQuickItem* parent)

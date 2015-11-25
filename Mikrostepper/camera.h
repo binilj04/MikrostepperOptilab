@@ -109,6 +109,7 @@ protected:
 class DSCameraProp : public NullCamProp
 {
 	Q_OBJECT
+	std::map<QString, double> min, max;
 public:
 	DSCameraProp(QObject* parent = nullptr);
 	~DSCameraProp();
@@ -150,10 +151,24 @@ public:
 public slots:
 	void oneShotWB();
 
+	void saveParametersA();
+	void loadParametersA();
+	void saveParametersB();
+	void loadParametersB();
+	void saveParametersC();
+	void loadParametersC();
+	void saveParametersD();
+	void loadParametersD();
+
 	void loadDefaultParameters();
+
+	int getCurrentParameterTeam();
 
 	CameraType cameraType() const;
 
+	double controlMin(const QString& control) const;
+	double controlMax(const QString& control) const;
+	bool controlAvailable(const QString& control) const;
 private:
 	void reloadParams();
 };
@@ -197,6 +212,7 @@ class ToupCameraProp : public CamProp
 {
 	Q_OBJECT
 	ToupWrapper* cam;
+	std::map<QString, double> min, max;
 public:
 	ToupCameraProp(ToupWrapper* camera);
 	~ToupCameraProp();
@@ -255,6 +271,10 @@ public slots:
 	void loadDefaultParameters();
 
 	CameraType cameraType() const;
+
+	double controlMin(const QString& control) const;
+	double controlMax(const QString& control) const;
+	bool controlAvailable(const QString& control) const;
 };
 
 /*

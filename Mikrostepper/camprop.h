@@ -125,6 +125,10 @@ public slots:
 
 	virtual CameraType cameraType() const = 0;
 
+	virtual double controlMin(const QString& control) const = 0;
+	virtual double controlMax(const QString& control) const = 0;
+	virtual bool controlAvailable(const QString& control) const = 0;
+
 private:
 	void saveParameter(int id);
 	void loadParameter(int id);
@@ -187,6 +191,10 @@ public:
 	void setWhiteBalanceBox(const QRect& r);
 	
 	CameraType cameraType() const;
+
+	double controlMin(const QString& control) const;
+	double controlMax(const QString& control) const;
+	bool controlAvailable(const QString& control) const;
 
 public slots:
 	void oneShotWB();

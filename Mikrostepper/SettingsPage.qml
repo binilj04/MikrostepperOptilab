@@ -40,7 +40,7 @@ Rectangle {
         sliderSaturation.value = camprop.saturation
         sliderGamma.value = camprop.gamma
         checkboxAutoExposure.checked = camprop.autoexposure
-        sliderGain.value = camprop.aeGain / 100
+        sliderGain.value = camprop.aeGain
         sliderTime.value = camprop.exposureTime / 1000
         sliderTarget.value = camprop.aeTarget
         sliderTemperature.value = camprop.whiteBalanceTemperature
@@ -392,15 +392,15 @@ Rectangle {
                         }
 
                         TextRegular {
-                            visible: camprop.cameraType() === 2
+                            visible: camprop.controlAvailable("hue")
                             text: "Hue: %1".arg(Math.round(sliderHue.value))
                         }
 
                         KeySlider {
                             id: sliderHue
-                            visible: camprop.cameraType() === 2
-                            minimumValue: -180
-                            maximumValue: 180
+                            visible: camprop.controlAvailable("hue")
+                            minimumValue: camprop.controlMin("hue")
+                            maximumValue: camprop.controlMax("hue")
                             stepSize: 1
                             Layout.alignment: Qt.AlignCenter
                             onValueChanged: camprop.hue = value
@@ -408,27 +408,29 @@ Rectangle {
 
                         TextRegular {
                             id: textRegular3
+                            visible: camprop.controlAvailable("saturation")
                             text: "Saturation: %1".arg(Math.round(sliderSaturation.value))
                         }
 
                         KeySlider {
                             id: sliderSaturation
-                            maximumValue: 255
-                            stepSize: 1
+                            maximumValue: camprop.controlMax("saturation")
+                            minimumValue: camprop.controlMin("saturation")
+                            stepSize: 0
                             Layout.alignment: Qt.AlignCenter
                             onValueChanged: camprop.saturation = value
                         }
 
                         TextRegular {
-                            visible: camprop.cameraType() === 2
+                            visible: camprop.controlAvailable("brightness")
                             text: "Brightness: %1".arg(Math.round(sliderBrightness.value))
                         }
 
                         KeySlider {
                             id: sliderBrightness
-                            visible: camprop.cameraType() === 2
-                            minimumValue: -64
-                            maximumValue: 64
+                            visible: camprop.controlAvailable("brightness")
+                            minimumValue: camprop.controlMin("brightness")
+                            maximumValue: camprop.controlMax("brightness")
                             stepSize: 1
                             Layout.alignment: Qt.AlignCenter
                             onValueChanged: camprop.brightness = value
@@ -436,12 +438,15 @@ Rectangle {
 
                         TextRegular {
                             id: textRegular2
+                            visible: camprop.controlAvailable("contrast")
                             text: "Contrast: %1".arg(Math.round(sliderContrast.value))
                         }
 
                         KeySlider {
                             id: sliderContrast
-                            maximumValue: 100
+                            visible: camprop.controlAvailable("contrast")
+                            minimumValue: camprop.controlMin("contrast")
+                            maximumValue: camprop.controlMax("contrast")
                             stepSize: 1
                             Layout.alignment: Qt.AlignCenter
                             onValueChanged: camprop.contrast = value
@@ -449,13 +454,15 @@ Rectangle {
 
                         TextRegular {
                             id: textRegular1
+                            visible: camprop.controlAvailable("gamma")
                             text: "Gamma: %1".arg(Math.round(sliderGamma.value))
                         }
 
                         KeySlider {
                             id: sliderGamma
-                            maximumValue: 250
-                            minimumValue: 10
+                            visible: camprop.controlAvailable("gamma")
+                            maximumValue: camprop.controlMax("gamma")
+                            minimumValue: camprop.controlMin("gamma")
                             stepSize: 1.0
                             Layout.alignment: Qt.AlignCenter
                             onValueChanged: camprop.gamma = value
@@ -483,8 +490,8 @@ Rectangle {
 
                         KeySlider {
                             id: sliderTarget
-                            maximumValue: 235
-                            minimumValue: 16
+                            maximumValue: camprop.controlMax("aetarget")
+                            minimumValue: camprop.controlMin("aetarget")
                             stepSize: 1
                             enabled: checkboxAutoExposure.checked
                             Layout.alignment: Qt.AlignCenter
@@ -498,8 +505,8 @@ Rectangle {
 
                         KeySlider {
                             id: sliderTime
-                            maximumValue: 2000
-                            minimumValue: 0.1
+                            maximumValue: camprop.controlMax("aeexposure")
+                            minimumValue: camprop.controlMin("aeexposure")
                             stepSize: 0.1
                             enabled: !checkboxAutoExposure.checked
                             Layout.alignment: Qt.AlignCenter
@@ -513,47 +520,47 @@ Rectangle {
 
                         KeySlider {
                             id: sliderGain
-                            maximumValue: 5
-                            minimumValue: 1
-                            stepSize: 0.01
+                            maximumValue: camprop.controlMax("aegain")
+                            minimumValue: camprop.controlMin("aegain")
+                            stepSize: 1
                             enabled: !checkboxAutoExposure.checked
                             Layout.alignment: Qt.AlignCenter
-                            onValueChanged: if (!checkboxAutoExposure.checked) camprop.aeGain = value * 100
+                            onValueChanged: if (!checkboxAutoExposure.checked) camprop.aeGain = value
                         }
 
                         Item { height: 15 }
 
                         TextBlack {
                             id: textBlack3
-                            visible: camprop.cameraType() === 2
+                            visible: camprop.controlAvailable("awbtemp")
                             text: "Manual White Balance"
                             font.pointSize: 10
                         }
 
                         TextRegular {
-                            visible: camprop.cameraType() === 2
+                            visible: camprop.controlAvailable("awbtemp")
                             text: "Temperature: %1".arg(Math.round(sliderTemperature.value))
                         }
 
                         KeySlider {
                             id: sliderTemperature
-                            visible: camprop.cameraType() === 2
-                            minimumValue: 2000
-                            maximumValue: 15000
+                            visible: camprop.controlAvailable("awbtemp")
+                            minimumValue: camprop.controlMin("awbtemp")
+                            maximumValue: camprop.controlMax("awbtemp")
                             Layout.alignment: Qt.AlignCenter
                             onValueChanged: camprop.whiteBalanceTemperature = value
                         }
 
                         TextRegular {
-                            visible: camprop.cameraType() === 2
+                            visible: camprop.controlAvailable("awbtint")
                             text: "Tint: %1".arg(Math.round(sliderTint.value))
                         }
 
                         KeySlider {
                             id: sliderTint
-                            visible: camprop.cameraType() === 2
-                            minimumValue: 200
-                            maximumValue: 2500
+                            visible: camprop.controlAvailable("awbtint")
+                            minimumValue: camprop.controlMinimum("awbtint")
+                            maximumValue: camprop.controlMaximum("awbtint")
                             stepSize: 1
                             Layout.alignment: Qt.AlignCenter
                             onValueChanged: camprop.whiteBalanceTint = value
@@ -565,31 +572,45 @@ Rectangle {
                         }
 
                         TextRegular {
+                            visible: camprop.controlAvailable("framerate")
                             text: "Frame Rate: %1".arg(sliderFrameRate.label)
                         }
 
                         KeySlider {
                             id: sliderFrameRate
-                            property string label: "Slowest"
+                            visible: camprop.controlAvailable("framerate")
+                            property string label: (camprop.cameraType() === 2) ? "Slowest" : "Normal"
                             minimumValue: 0
-                            maximumValue: (camprop.cameraType() === 2) ? 3 : 2
+                            maximumValue: camprop.controlMax("framerate")
                             stepSize: 1
                             Layout.alignment: Qt.AlignCenter
                             onValueChanged: {
                                 camprop.frameRate = value
-                                switch (value) {
-                                case 0:
-                                    label = "Slowest"
-                                    break
-                                case 1:
-                                    label = "Slow"
-                                    break
-                                case 2:
-                                    label = "Fast"
-                                    break
-                                case 3:
-                                    label = "Fastest"
-                                    break
+                                if (camprop.cameraType() === 2) {
+                                    switch (value) {
+                                    case 0:
+                                        label = "Slowest"
+                                        break
+                                    case 1:
+                                        label = "Slow"
+                                        break
+                                    case 2:
+                                        label = "Fast"
+                                        break
+                                    case 3:
+                                        label = "Fastest"
+                                        break
+                                    }
+                                }
+                                else if (camprop.cameraType() === 1) {
+                                    switch (value) {
+                                    case 0:
+                                        label = "Normal"
+                                        break
+                                    case 1:
+                                        label = "Super"
+                                        break
+                                    }
                                 }
                             }
                         }
@@ -1106,6 +1127,9 @@ Rectangle {
         else if (lastParams === 2) radioButton3.checked = true
         else radioButton4.checked = true
         updateCamera()
+
+        camprop.gamma += 10
+        camprop.gamma -= 10
     }
 
     Timer {
@@ -1115,7 +1139,7 @@ Rectangle {
         running: checkboxAutoExposure.checked
         onTriggered: {
             sliderTime.value = camprop.exposureTime / 1000.0
-            sliderGain.value = camprop.aeGain / 100.0
+            sliderGain.value = camprop.aeGain
         }
     }
 

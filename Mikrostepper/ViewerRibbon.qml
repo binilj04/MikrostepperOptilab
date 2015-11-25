@@ -32,13 +32,13 @@ Rectangle {
     }
 
     function singleCapture() {
-        _lastAE = camprop.autoexposure
-        camprop.autoexposure = false
-        _lastExpTime = camprop.exposureTime
-        var et = _lastExpTime / 2.295
-        camprop.exposureTime = et
         if (camprop.cameraType() === 1)
         {
+            _lastAE = camprop.autoexposure
+            camprop.autoexposure = false
+            _lastExpTime = camprop.exposureTime
+            var et = _lastExpTime / 2.295
+            camprop.exposureTime = et
             _lastFps = camprop.frameRate
             camprop.frameRate = 0
         }

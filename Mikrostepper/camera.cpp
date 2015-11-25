@@ -474,7 +474,6 @@ void DSCameraProp::setFrameRate(int speed)
 
 void DSCameraProp::reloadParams() 
 {
-	setFrameRate(0);
 	emit rGainChanged(rGain());
 	emit gGainChanged(gGain());
 	emit bGainChanged(bGain());

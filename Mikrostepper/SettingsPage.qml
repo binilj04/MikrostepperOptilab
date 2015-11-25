@@ -416,7 +416,7 @@ Rectangle {
                             id: sliderSaturation
                             maximumValue: camprop.controlMax("saturation")
                             minimumValue: camprop.controlMin("saturation")
-                            stepSize: 0
+                            stepSize: 1
                             Layout.alignment: Qt.AlignCenter
                             onValueChanged: camprop.saturation = value
                         }
@@ -500,7 +500,8 @@ Rectangle {
 
                         TextRegular {
                             id: textRegular5
-                            text: "Exposure Time: %1 ms".arg(sliderTime.value)
+                            property real multiplier: (camprop.cameraType() === 1) ? 100 : 1
+                            text: "Exposure Time: %1 ms".arg(sliderTime.value * multiplier)
                         }
 
                         KeySlider {

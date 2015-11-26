@@ -74,7 +74,7 @@ Rectangle {
         onPreciseTimerTriggered: {
             if (_scCount == 1)
                 optilab.stopPreciseTimer()
-            var fout = optilab.fromLocalFile(optilab.currentPath() + "/IMG_" + Qt.formatDateTime(new Date(), "dd-MM-yyyy_hh-mm-ss-zzz") + ".png")
+            var fout = scSave.folder + "/IMG_" + Qt.formatDateTime(new Date(), "dd-MM-yyyy_hh-mm-ss-zzz") + ".png"
             optilab.captureAsync(fout)
             --_scCount
         }
@@ -149,6 +149,14 @@ Rectangle {
 
     PreviewSC {
         id: previewSC
+        onAbortSC: _scCount = 1
+    }
+
+    FileDialog {
+        id: scSave
+        selectFolder: true
+        title: "Save Folder"
+        onAccepted: serialCapture()
     }
 
     TimeEdit {
@@ -213,7 +221,7 @@ Rectangle {
         onClicked: {
             _scCount = spinSCount.val
             _interval = ie1.totalInterval() * 1000
-            serialCapture()
+            scSave.open()
         }
     }
 
@@ -279,7 +287,7 @@ Rectangle {
             var duration = ie3.totalInterval()
             _scCount = Math.round(duration / interval)
             _interval = interval * 1000
-            serialCapture()
+            scSave.open()
         }
     }
 

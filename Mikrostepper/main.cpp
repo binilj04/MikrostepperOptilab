@@ -2,6 +2,7 @@
 #include <QApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <QQuickView>
 
 #include "lebenwindow.h"
 
@@ -25,6 +26,11 @@ int main(int argc, char *argv[])
 	qmlRegisterType<LebenWindow>("Leben.Asa", 1, 0, "LebenWindow");
 	qmlRegisterType<QuickCam>("QuickCam", 1, 0, "CameraItem");
 
+	QQmlApplicationEngine splashscreen;
+	app.processEvents();
+	splashscreen.load({ QUrl{ QStringLiteral("qrc:///SplashScreen.qml") } });
+	app.processEvents();
+
     AppSettings settings;
 	settings.updateCNCSettings();
 	vector<unique_ptr<CamProp>> vprop;
@@ -44,8 +50,8 @@ int main(int argc, char *argv[])
 		}
 		else
 		{
-			delete camera;
-			camera = new MockCamera();
+			//delete camera;
+			//camera = new MockCamera();
 			vprop.emplace_back(new NullCamProp(camera));
 		}
 	}

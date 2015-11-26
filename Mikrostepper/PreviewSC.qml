@@ -10,6 +10,8 @@ Dialog {
     property int totalCount: 9999
     property int current: -1
 
+    signal abortSC
+
     Connections {
         target: optilab
         onImageSaved: {
@@ -27,6 +29,7 @@ Dialog {
 
     onVisibleChanged: {
         if (!visible) {
+            abortSC()
             immodel.clear()
             current = -1
             view.source = ""
@@ -81,15 +84,17 @@ Dialog {
 
         ButtonSimple {
             id: buttonCancel
-            text: "Cancel"
+            text: "Abort"
+            visible: immodel.count != totalCount
             tooltip: "Cancel capture operation and discard images"
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 20
-            anchors.horizontalCenterOffset: 1.5*width
+//            anchors.horizontalCenterOffset: 1.5*width
             anchors.horizontalCenter: parent.horizontalCenter
             drawBorder: true
             onClicked: {
                 optilab.flushCommands()
+                abortSC()
                 imageModel.clear()
                 root.close()
             }
@@ -98,7 +103,8 @@ Dialog {
             id: buttonSave
             text: "Save"
             tooltip: "Save images to disk"
-            visible: (immodel.count == totalCount)
+//            visible: (immodel.count == totalCount)
+            visible: false
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 20
             anchors.horizontalCenterOffset: -1.5 * width

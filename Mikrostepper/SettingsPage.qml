@@ -560,8 +560,8 @@ Rectangle {
                         KeySlider {
                             id: sliderTint
                             visible: camprop.controlAvailable("awbtint")
-                            minimumValue: camprop.controlMinimum("awbtint")
-                            maximumValue: camprop.controlMaximum("awbtint")
+                            minimumValue: camprop.controlMin("awbtint")
+                            maximumValue: camprop.controlMax("awbtint")
                             stepSize: 1
                             Layout.alignment: Qt.AlignCenter
                             onValueChanged: camprop.whiteBalanceTint = value

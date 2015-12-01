@@ -83,7 +83,8 @@ void CamProp::reloadParams()
 
 int CamProp::getCurrentParameterTeam()
 {
-	return lastParam;
+	AppSettings a;
+	return a.readInt("CameraLastParams");
 }
 
 class SettingsGenerator
@@ -165,6 +166,11 @@ void CamProp::loadParameter(int id)
 	setVFlip(a.readBool(sg.gen("isVFlip"), false));
 	setSamplingMode(a.readBool(sg.gen("isBin"), true));
 	setWhiteBalanceBox(a.readRect(sg.gen("whiteBalanceBox"), QRectF{ 50.0, 50.0, 50.0, 50.0 }).toRect());
+	lastParam = id;
+}
+
+void CamProp::setLastParam(int id)
+{
 	lastParam = id;
 }
 

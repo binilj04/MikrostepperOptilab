@@ -8,6 +8,7 @@ Rectangle {
     id: root
     property alias keysModel: _model
     property bool requireRestart: false
+    property bool updatingCamera: false
     width: 900
     height: 600
 
@@ -35,6 +36,7 @@ Rectangle {
     }
 
     function updateCamera() {
+        updatingCamera = true
         sliderHue.value = camprop.hue
         sliderContrast.value = camprop.contrast
         sliderSaturation.value = camprop.saturation
@@ -49,14 +51,24 @@ Rectangle {
             checkBoxColor.checked = true
         else
             checkBoxBW.checked = true
-        if (camprop.isHFlip)
-            checkBoxHFlip.checked = true
-        if (camprop.isVFlip)
-            checkBoxVFlip.checked = true
+        if (camprop.isHFlip !== checkBoxHFlip.checked)
+            checkBoxHFlip.checked = camprop.isHFlip
+        if (camprop.isVFlip !== checkBoxVFlip.checked)
+            checkBoxVFlip.checked = camprop.isVFlip
         if (camprop.isBin)
             checkBoxBin.checked = true
         else
             checkBoxSkip.checked = true
+        sliderFrameRate.value = camprop.frameRate
+
+        camprop.gamma += 10
+        camprop.gamma -= 10
+        camprop.aeGain += 10
+        camprop.aeGain -= 10
+        camprop.exposureTime += 5
+        camprop.exposureTime -= 5
+
+        updatingCamera = false
     }
 
     BusyDialog {
@@ -403,7 +415,10 @@ Rectangle {
                             maximumValue: camprop.controlMax("hue")
                             stepSize: 1
                             Layout.alignment: Qt.AlignCenter
-                            onValueChanged: camprop.hue = value
+                            onValueChanged: {
+                                if (!updatingCamera)
+                                    camprop.hue = value
+                            }
                         }
 
                         TextRegular {
@@ -418,7 +433,10 @@ Rectangle {
                             minimumValue: camprop.controlMin("saturation")
                             stepSize: 1
                             Layout.alignment: Qt.AlignCenter
-                            onValueChanged: camprop.saturation = value
+                            onValueChanged: {
+                                if (!updatingCamera)
+                                    camprop.saturation = value
+                            }
                         }
 
                         TextRegular {
@@ -433,7 +451,10 @@ Rectangle {
                             maximumValue: camprop.controlMax("brightness")
                             stepSize: 1
                             Layout.alignment: Qt.AlignCenter
-                            onValueChanged: camprop.brightness = value
+                            onValueChanged: {
+                                if (!updatingCamera)
+                                    camprop.brightness = value
+                            }
                         }
 
                         TextRegular {
@@ -449,7 +470,10 @@ Rectangle {
                             maximumValue: camprop.controlMax("contrast")
                             stepSize: 1
                             Layout.alignment: Qt.AlignCenter
-                            onValueChanged: camprop.contrast = value
+                            onValueChanged: {
+                                if (!updatingCamera)
+                                    camprop.contrast = value
+                            }
                         }
 
                         TextRegular {
@@ -465,7 +489,10 @@ Rectangle {
                             minimumValue: camprop.controlMin("gamma")
                             stepSize: 1.0
                             Layout.alignment: Qt.AlignCenter
-                            onValueChanged: camprop.gamma = value
+                            onValueChanged: {
+                                if (!updatingCamera)
+                                    camprop.gamma = value
+                            }
                         }
 
                         Item { height: 15 }
@@ -480,7 +507,10 @@ Rectangle {
                             id: checkboxAutoExposure
                             text: "Automatic Exposure"
                             checked: camprop.autoexposure
-                            onCheckedChanged: camprop.autoexposure = checked
+                            onCheckedChanged: {
+                                if (!updatingCamera)
+                                    camprop.autoexposure = checked
+                            }
                         }
 
                         TextRegular {
@@ -495,7 +525,10 @@ Rectangle {
                             stepSize: 1
                             enabled: checkboxAutoExposure.checked
                             Layout.alignment: Qt.AlignCenter
-                            onValueChanged: camprop.aeTarget = value
+                            onValueChanged: {
+                                if (!updatingCamera)
+                                    camprop.aeTarget = value
+                            }
                         }
 
                         TextRegular {
@@ -511,7 +544,7 @@ Rectangle {
                             stepSize: 0.1
                             enabled: !checkboxAutoExposure.checked
                             Layout.alignment: Qt.AlignCenter
-                            onValueChanged: if (!checkboxAutoExposure.checked) camprop.exposureTime = value * 1000
+                            onValueChanged: if (!checkboxAutoExposure.checked && !updatingCamera) camprop.exposureTime = value * 1000
                         }
 
                         TextRegular {
@@ -526,7 +559,7 @@ Rectangle {
                             stepSize: 1
                             enabled: !checkboxAutoExposure.checked
                             Layout.alignment: Qt.AlignCenter
-                            onValueChanged: if (!checkboxAutoExposure.checked) camprop.aeGain = value
+                            onValueChanged: if (!checkboxAutoExposure.checked && !updatingCamera) camprop.aeGain = value
                         }
 
                         Item { height: 15 }
@@ -549,7 +582,10 @@ Rectangle {
                             minimumValue: camprop.controlMin("awbtemp")
                             maximumValue: camprop.controlMax("awbtemp")
                             Layout.alignment: Qt.AlignCenter
-                            onValueChanged: camprop.whiteBalanceTemperature = value
+                            onValueChanged: {
+                                if (!updatingCamera)
+                                    camprop.whiteBalanceTemperature = value
+                            }
                         }
 
                         TextRegular {
@@ -564,7 +600,10 @@ Rectangle {
                             maximumValue: camprop.controlMax("awbtint")
                             stepSize: 1
                             Layout.alignment: Qt.AlignCenter
-                            onValueChanged: camprop.whiteBalanceTint = value
+                            onValueChanged: {
+                                if (!updatingCamera)
+                                    camprop.whiteBalanceTint = value
+                            }
                         }
 
                         TextBlack {
@@ -586,7 +625,6 @@ Rectangle {
                             stepSize: 1
                             Layout.alignment: Qt.AlignCenter
                             onValueChanged: {
-                                camprop.frameRate = value
                                 if (camprop.cameraType() === 2) {
                                     switch (value) {
                                     case 0:
@@ -612,6 +650,9 @@ Rectangle {
                                         label = "Super"
                                         break
                                     }
+                                }
+                                if (!updatingCamera) {
+                                    camprop.frameRate = value
                                 }
                             }
                         }
@@ -706,7 +747,8 @@ Rectangle {
                         exclusiveGroup: group2
                         onCheckedChanged: {
                             if (checked) camprop.loadParametersA()
-                            updateCamera()
+                            updatingCamera = true
+                            camUpdating.start()
                         }
                     }
 
@@ -717,7 +759,8 @@ Rectangle {
                         exclusiveGroup: group2
                         onCheckedChanged: {
                             if (checked) camprop.loadParametersB()
-                            updateCamera()
+                            updatingCamera = true
+                            camUpdating.start()
                         }
                     }
 
@@ -728,7 +771,8 @@ Rectangle {
                         exclusiveGroup: group2
                         onCheckedChanged: {
                             if (checked) camprop.loadParametersC()
-                            updateCamera()
+                            updatingCamera = true
+                            camUpdating.start()
                         }
                     }
 
@@ -739,7 +783,8 @@ Rectangle {
                         exclusiveGroup: group2
                         onCheckedChanged: {
                             if (checked) camprop.loadParametersD()
-                            updateCamera()
+                            updatingCamera = true
+                            camUpdating.start()
                         }
                     }
 
@@ -1119,7 +1164,7 @@ Rectangle {
     }
 
     Component.onCompleted: {
-        var lastParams = appsettings.readInt("CameraLastParams", 0)
+        var lastParams = camprop.getCurrentParameterTeam()
         if (lastParams === 0) {
             radioButton1.checked = true
             camprop.loadParametersA()
@@ -1128,9 +1173,6 @@ Rectangle {
         else if (lastParams === 2) radioButton3.checked = true
         else radioButton4.checked = true
         updateCamera()
-
-        camprop.gamma += 10
-        camprop.gamma -= 10
     }
 
     Timer {
@@ -1144,5 +1186,10 @@ Rectangle {
         }
     }
 
+    Timer {
+        id: camUpdating
+        interval: 1000
+        onTriggered: updateCamera()
+    }
 }
 

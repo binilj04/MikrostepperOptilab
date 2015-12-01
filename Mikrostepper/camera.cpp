@@ -494,6 +494,7 @@ void DSCameraProp::saveParametersA()
 void DSCameraProp::loadParametersA()
 {
 	CameraReadParameter(PARAMETER_TEAM_A);
+	setLastParam(0);
 }
 
 void DSCameraProp::saveParametersB()
@@ -504,6 +505,7 @@ void DSCameraProp::saveParametersB()
 void DSCameraProp::loadParametersB()
 {
 	CameraReadParameter(PARAMETER_TEAM_B);
+	setLastParam(1);
 }
 
 void DSCameraProp::saveParametersC()
@@ -514,6 +516,7 @@ void DSCameraProp::saveParametersC()
 void DSCameraProp::loadParametersC()
 {
 	CameraReadParameter(PARAMETER_TEAM_C);
+	setLastParam(2);
 }
 
 void DSCameraProp::saveParametersD()
@@ -524,6 +527,7 @@ void DSCameraProp::saveParametersD()
 void DSCameraProp::loadParametersD()
 {
 	CameraReadParameter(PARAMETER_TEAM_D);
+	setLastParam(3);
 }
 
 void DSCameraProp::loadDefaultParameters()

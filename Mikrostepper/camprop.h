@@ -129,6 +129,9 @@ public slots:
 	virtual double controlMax(const QString& control) const = 0;
 	virtual bool controlAvailable(const QString& control) const = 0;
 
+protected:
+	void setLastParam(int);
+
 private:
 	void saveParameter(int id);
 	void loadParameter(int id);

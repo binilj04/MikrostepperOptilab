@@ -116,7 +116,13 @@ Rectangle {
 
     Dialog {
         id: preview1
-        title: "Preview"
+        title: {
+            var imsize = optilab.imageSize("swrdaol.jpg")
+            var ttl = "Captured Image %1x%2"
+            if (imsize.width * imsize.height < 4100 * 3075)
+                return ttl.arg(4100).arg(3075)
+            return ttl.arg(imsize.width).arg(imsize.height)
+        }
         width: 800
         height: 600
 
@@ -149,6 +155,14 @@ Rectangle {
 
     PreviewSC {
         id: previewSC
+        title: {
+            if (camprop.cameraType() === 1)
+                return "Captured Images 1280x960"
+            else if (camprop.cameraType() === 2)
+                return "Captured Images 1228x992"
+            return "Captured Images"
+        }
+
         onAbortSC: _scCount = 1
     }
 

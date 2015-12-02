@@ -69,6 +69,7 @@ public slots:
 
 	// An utility function! Qt really should add this to Qt namespace!!
 	QUrl fromLocalFile(const QString& localfile);
+	QString toLocalFile(const QUrl& url);
 	void startPreciseTimer(int duration);
 	void stopPreciseTimer();
 

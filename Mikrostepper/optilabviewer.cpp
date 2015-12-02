@@ -219,6 +219,11 @@ QUrl OptilabViewer::fromLocalFile(const QString& localfile)
 	return QUrl::fromLocalFile(localfile);
 }
 
+QString OptilabViewer::toLocalFile(const QUrl& url)
+{
+	return url.toLocalFile();
+}
+
 bool OptilabViewer::scRunning() const
 {
 	return m_timer.isActive();

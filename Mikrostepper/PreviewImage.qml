@@ -52,6 +52,9 @@ Rectangle {
         anchors.left: parent.left
         anchors.leftMargin: 25
 
+        asynchronous: true
+        cache: false
+
         sourceSize.width: width
         sourceSize.height: height
     }

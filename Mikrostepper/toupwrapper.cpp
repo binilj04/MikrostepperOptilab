@@ -150,6 +150,7 @@ void CALLBACK toup_callback(unsigned nEvent, void* pCallbackCtx)
 		break;
 	case TOUPCAM_EVENT_ERROR:
 		toup->cbCameraError();
+		toup->cbStillImageReady();
 		break;
 	case TOUPCAM_EVENT_DISCONNECTED:
 		toup->cbCameraError();

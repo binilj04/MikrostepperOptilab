@@ -116,13 +116,7 @@ Rectangle {
 
     Dialog {
         id: preview1
-        title: {
-            var imsize = optilab.imageSize("swrdaol.jpg")
-            var ttl = "Captured Image %1x%2"
-            if (imsize.width * imsize.height < 4100 * 3075)
-                return ttl.arg(4100).arg(3075)
-            return ttl.arg(imsize.width).arg(imsize.height)
-        }
+        title: "Captured Image"
         width: 800
         height: 600
 
@@ -134,6 +128,15 @@ Rectangle {
 
         onVisibleChanged: {
             if (!visible) preview1.source = ""
+        }
+
+        onSourceChanged: {
+            var imsize = optilab.imageSize("swrdaol.jpg")
+            var ttl = "Captured Image %1x%2"
+            if (imsize.width * imsize.height < 4100 * 3075)
+                title =  ttl.arg(4100).arg(3075)
+            else
+                title = ttl.arg(imsize.width).arg(imsize.height)
         }
 
         contentItem: PreviewImage {

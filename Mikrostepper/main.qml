@@ -10,7 +10,7 @@ LebenWindow {
     visible: true
     width: 1280
     height: 720
-    title: qsTr("Microstepper")
+    title: qsTr("Optilab")
 //    x: (Screen.width - width) / 2
 //    y: (Screen.height - height) / 2
 

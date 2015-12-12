@@ -1,3 +1,4 @@
+#define QT_OPENGL angle
 #include <QtCore>
 #include <QtGui>
 #include <QImage>

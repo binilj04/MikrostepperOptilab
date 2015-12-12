@@ -41,6 +41,7 @@ Rectangle {
         sliderContrast.value = camprop.contrast
         sliderSaturation.value = camprop.saturation
         sliderGamma.value = camprop.gamma
+        sliderBrightness.value = camprop.brightness
         checkboxAutoExposure.checked = camprop.autoexposure
         sliderGain.value = camprop.aeGain
         sliderTime.value = camprop.exposureTime / 1000

@@ -22,7 +22,8 @@ Rectangle {
         title: "Save Image"
         nameFilters: [ "Portable Network Graphics (*.png)",
             "JPEG Standard Format (*.jpg)",
-            "Windows Bitmap (*.bmp)" ]
+            "Windows Bitmap (*.bmp)",
+            "Tagged Image File Format (*.tiff)"]
         selectExisting: false
         selectMultiple: false
         onAccepted: {

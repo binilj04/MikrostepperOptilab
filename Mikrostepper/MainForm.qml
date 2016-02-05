@@ -16,10 +16,54 @@ Item {
     Dialog {
         id: dgSettings
         width: 900
-        height: 600
-        standardButtons: StandardButton.RestoreDefaults | StandardButton.Ok | StandardButton.Cancel
-        SettingsPage {
-            id: settingspage
+        height: 650
+        contentItem: Item {
+            width: 900
+            height: 650
+            SettingsPage {
+                id: settingspage
+                anchors {
+                    top: parent.top; left:parent.left;
+                    right: parent.right;
+                    bottom: parent.bottom; bottomMargin: 50
+                }
+            }
+            Rectangle {
+                color: "#ecf0f1"
+                anchors {
+                    top: settingspage.bottom; left:parent.left; right:parent.right
+                    bottom: parent.bottom
+                }
+                Button {
+                    id: dgSettingsReset
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors {
+                        left: parent.left; leftMargin: 30
+                    }
+                    text: "&Reset Defaults"
+                    onClicked: dgSettings.reset()
+                }
+
+                Button {
+                    id: dgSettingsOk
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors {
+                        right: dgSettingsCancel.left; rightMargin: 30
+                    }
+                    text: "OK"
+                    onClicked: dgSettings.accept()
+                }
+
+                Button {
+                    id: dgSettingsCancel
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors {
+                        right: parent.right; rightMargin: 30
+                    }
+                    text: "Cancel"
+                    onClicked: dgSettings.reject()
+                }
+            }
         }
         onAccepted: {
             settingspage.updateSettings()

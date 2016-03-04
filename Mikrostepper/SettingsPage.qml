@@ -1173,6 +1173,8 @@ Rectangle {
         else if (lastParams === 1) radioButton2.checked = true
         else if (lastParams === 2) radioButton3.checked = true
         else radioButton4.checked = true
+        if (camprop.cameraType() === 1)
+            camprop.setFrameRate(2);
         updateCamera()
     }
 

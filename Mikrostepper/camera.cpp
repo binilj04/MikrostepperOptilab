@@ -245,8 +245,6 @@ DSCameraProp::DSCameraProp(QObject* parent)
 	max["green"] = 255;
 	min["blue"] = 10;
 	max["blue"] = 255;
-	min["framerate"] = 0;
-	max["framerate"] = 1;
 	reloadParams();
 }
 

@@ -243,7 +243,7 @@ void CNCStepper::updateStatus() {
 	std::bitset<8> limit = lim;
 
 	for (int n = 0; n < 8; ++n) {
-		if (m_limit.at(n) != limit.at(n)) {
+		if (m_limit[n] != limit[n]) {
 			m_limit[n] = limit[n];
 			if (n == 0)
 				emit limit0Changed(m_limit[0]);

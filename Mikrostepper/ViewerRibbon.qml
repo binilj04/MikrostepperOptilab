@@ -144,8 +144,7 @@ Rectangle {
             onAccept: {
                 var imsize = optilab.imageSize("swrdaol.jpg")
                 if (imsize.width * imsize.height < 4100 * 3075)
-                    optilab.scaleImage("swrdaol.jpg", 4100, 3075)
-                optilab.copyFromTemp("swrdaol.jpg", preview1.savePath)
+                    optilab.scaleImage("swrdaol.jpg", preview1.savePath, 4100, 3075)
                 preview1.source = ""
                 preview1.hide()
             }

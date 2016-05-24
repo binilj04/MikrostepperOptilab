@@ -119,7 +119,7 @@ int CALLBACK SnapThreadCallback(BYTE* pBuffer) {
 void DSCamera::imageProc(const BuffObj& pBuffer) {
 	auto sz = size();
 	m_buffer = QImage(pBuffer.getData(), sz.width(), sz.height(), QImage::Format_RGB888).copy().rgbSwapped().mirrored(false, true);
-	cv::Mat fr{ sz.height(), sz.width(), CV_8UC3, (uchar*)m_buffer.bits(), (size_t)m_buffer.bytesPerLine() };
+	cv::Mat fr{ sz.height(), sz.width(), CV_8UC3, (uchar*)pBuffer.getData() };
 	recorder.setFrame(fr);
 	emit frameReady(m_buffer);
 }
@@ -630,8 +630,9 @@ double ToupCamera::focusValue()
 void ToupCamera::pullImage()
 {
 	auto img = m_camera.pullImage();
-	m_buffer = img.image().rgbSwapped().mirrored(false, true);
-	recorder.setFrame(img);
+	m_buffer = img.image().copy().rgbSwapped().mirrored(false, true);
+	cv::Mat fr{ img.size().height(), img.size().width(), CV_8UC3, (uchar*)img.buffer(), (size_t)img.image().bytesPerLine() };
+	recorder.setFrame(fr.clone());
 	//qDebug() << "osc: " << m_buffer.bits();
 	emit frameReady(m_buffer);
 }
@@ -642,7 +643,8 @@ void ToupCamera::pullStillImage()
 	if (QFile::exists(m_filename))
 		QFile::remove(m_filename);
 	//qDebug() << "sav: " << still.buffer();
-	still.image().rgbSwapped().mirrored().save(m_filename);
+    auto ext = m_filename.right(3).toUpper().toStdString().c_str();
+    still.image().rgbSwapped().mirrored().save(m_filename, ext);
 	emit captureReady(m_filename);
 }
 
@@ -1077,7 +1079,9 @@ void QuickCam::updateImage(const QImage &frame) {
         else
             m_frame = src;
 	}
-	update();
+	if (m_frame.bits())
+		update();
+	//qDebug() << "tex: " << m_frame.bits();
 	emit sourceChanged(m_frame);
 }
 

@@ -100,6 +100,8 @@ public:
 		QString s;
 		AppSettings app;
 		SettingsObj(const QString& setting) : s{ setting }, app{ } { }
+		SettingsObj(const SettingsObj& o) : s{ o.s }, app{ } { }
+		SettingsObj(SettingsObj&& o) : s{ std::move(o.s) }, app{} { }
 
 		void operator<<(const QVariant& value)
 		{

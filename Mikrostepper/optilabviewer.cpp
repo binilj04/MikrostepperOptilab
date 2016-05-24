@@ -1,8 +1,10 @@
 #include "stdafx.h"
 #include "optilabviewer.h"
 
+#include <iostream>
 #include <thread>
 #include <future>
+using namespace std;
 
 OptilabViewer::OptilabViewer(Camera *parent)
     : QObject(parent), m_camera(parent), en_recording(WaitForFile)
@@ -88,13 +90,30 @@ void OptilabViewer::copyToFolder(const QUrl &image, const QUrl &folder) {
     QFile::copy(img, path);
 }
 
-void OptilabViewer::scaleImage(const QString& image, int w, int h, Qt::AspectRatioMode ar, Qt::TransformationMode md) 
+void OptilabViewer::scaleImage(const QString& image, const QUrl& out, int w, int h, Qt::AspectRatioMode ar, Qt::TransformationMode md) 
 {
 	QImage im{ image };
 	if (im.isNull()) return;
 	auto img = im.scaled(w, h, ar, md);
-	QFile::remove(image);
-	img.save(image);
+	auto output = out.toLocalFile();
+	if (QFile::exists(output))
+		QFile::remove(output);
+    QImageWriter imwriter{ output };
+    imwriter.setProgressiveScanWrite(true);
+    imwriter.setOptimizedWrite(true);
+	QFileInfo finf{ output };
+	auto ext = finf.suffix().toUpper();
+	imwriter.setFormat(ext.toUtf8());
+	if (ext == "JPG")
+	{
+		imwriter.setQuality(100);
+	}
+	if (ext == "TIFF")
+	{
+		imwriter.setCompression(1);
+	}
+    if (!imwriter.write(img))
+        cerr << "Error when saving image: " << imwriter.errorString().toStdString() << endl;
 }
 
 QSize OptilabViewer::imageSize(const QString& image)

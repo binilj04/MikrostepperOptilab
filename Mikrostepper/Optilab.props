@@ -15,14 +15,14 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(OPENCV_DIR)\lib;$(DSCAM_DIR);$(CNCAPI_DIR);$(TOUP_DIR)\win\x86\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opencv_core300.lib;opencv_imgcodecs300.lib;opencv_imgproc300.lib;opencv_videoio300.lib;DSCAMSDK.lib;toupcam.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opencv_core310.lib;opencv_imgcodecs310.lib;opencv_imgproc310.lib;opencv_videoio310.lib;opencv_highgui310.lib;DSCAMSDK.lib;toupcam.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(OPENCV_DIR)\bin\opencv_core300.dll" "$(OutDir)\"
-copy "$(OPENCV_DIR)\bin\opencv_ffmpeg300.dll" "$(OutDir)\"
-copy "$(OPENCV_DIR)\bin\opencv_imgcodecs300.dll" "$(OutDir)\"
-copy "$(OPENCV_DIR)\bin\opencv_imgproc300.dll" "$(OutDir)\"
-copy "$(OPENCV_DIR)\bin\opencv_videoio300.dll" "$(OutDir)\"
+      <Command>copy "$(OPENCV_DIR)\bin\opencv_core310.dll" "$(OutDir)\"
+copy "$(OPENCV_DIR)\bin\opencv_ffmpeg310.dll" "$(OutDir)\"
+copy "$(OPENCV_DIR)\bin\opencv_imgcodecs310.dll" "$(OutDir)\"
+copy "$(OPENCV_DIR)\bin\opencv_imgproc310.dll" "$(OutDir)\"
+copy "$(OPENCV_DIR)\bin\opencv_videoio310.dll" "$(OutDir)\"
 copy "$(DSCAM_DIR)\DSCAMSDK.dll" "$(OutDir)\"
 copy "$(CNCAPI_DIR)\CNCUSBControllerAPI.dll" "$(OutDir)\"
 copy "$(CNCAPI_DIR)\CNCUSBControllerLib.dll" "$(OutDir)\"

@@ -101,7 +101,7 @@ public:
 	double z() { return m_z; }
     int bufferFree() { return m_bufferFree; }
 
-	bool limitAt(int id) override { return m_limit.at(id); }
+	bool limitAt(int id) override { return m_limit[id]; }
 
 public slots:
     int bufferSize() { return m_bufferSize; }
@@ -148,7 +148,7 @@ public:
 	double z() { return m_z; }
 	int bufferFree() { return m_bufferFree; }
 
-	bool limitAt(int id) override { return m_limit.at(id); }
+	bool limitAt(int id) override { return m_limit[id]; }
 
 public slots:
 	int bufferSize() { return m_bufferSize; }
